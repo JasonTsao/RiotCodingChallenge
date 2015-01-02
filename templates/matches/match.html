@@ -1,11 +1,115 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block additionalHead %}
+<link rel="stylesheet" href="{% static 'css/matches/match.css' %}">
+{% endblock %}
+
+
 {% block bodyContent %}
 <div id="bodycontent" style="width:100%">
-	
+	<div class="teams-title-container">
+        <div class="team-title">
+            <h1>Challenger</h1>
+        </div>
+        <div class="team-title">
+            <h1>Opponent</h1>
+        </div>
+
+        <div class="matchup-container" id="challenger-matchup-container">
+            <div class="swiper-container" id="swiper-container-challenger">
+                <!--<div class="collection-profile-ranking-container">
+                    <div class="collection-profile-ranking-number">
+                    </div>
+                </div>-->
+                <div class="swiper-wrapper" id="challenger-swiper-wrapper">
+                </div>
+                <div class="pagination-wrapper">
+                    <div class="matchup-pagination" id="pagination-challenger"></div>
+                </div>
+            </div>
+        </div>
+        <div class="matchup-container" id="opponent-matchup-container">
+            <div class="swiper-container" id="swiper-container-opponent">
+                <!--<div class="collection-profile-ranking-container">
+                    <div class="collection-profile-ranking-number">
+                    </div>
+                </div>-->
+                <div class="swiper-wrapper" id="opponent-swiper-wrapper">
+                </div>
+                <div class="pagination-wrapper">
+                    <div class="matchup-pagination" id="pagination-opponent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block endScripts%}
+<script>
+    $(document).ready(function() {
+        $('.swiper-container').each(function(){
+            $(this).height($(this).width());
+        })
+        getCurrentMatchData();
+    });
+
+    function getCurrentMatchData(){
+        $.ajax({
+            type: "GET",
+            url: "{% url 'riot.api.getUserMatchData'%}",
+            success: function(data) {
+                console.log(data);
+                setCurrentMatchData(data);
+            },error: function(data) {
+                console.log(data);
+            }
+        });
+    }
+
+    function setCurrentMatchData(match_data){
+        console.log(match_data);
+
+
+        /* SET CHALENGER SWIPER*/
+        var swiper_wrapper_id = '#challenger-swiper-wrapper';
+        var swiper_wrapper = $(swiper_wrapper_id);
+
+        var pagination_id = '#pagination-challenger';
+
+        console.log('team');
+        console.log(match_data.response.participants);
+
+        /*for(picture in data.user_images){
+            var picture_data = data.user_images[picture];
+            var swiper_container = $('.swiper-container');
+            var swiper_slide = $('<div class="swiper-slide"/>');
+
+            var img_text = '<img class="collection-carousel-display"/>';
+            var slide_img = $(img_text);
+
+            slide_img.attr('src', picture_data['standard_resolution']);
+
+            //IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_id);
+            slide_img.css({'max-height':'100%', 'max-width':'100%'});
+
+            swiper_slide.append(slide_img);
+            swiper_wrapper.append(swiper_slide);
+        }*/
+
+        var challengerSwiper = new Swiper('#swiper-container-challenger',{
+            mode: 'horizontal',
+            calculateHeight:true,
+            loop: true,
+            //pagination: '.pagination',
+            pagination: pagination_id,
+            paginationClickable: true,
+            autoResize:false,
+        });
+
+        /* SET OPPONENT SWIPER*/
+    }
+
+</script>
 {% endblock %}

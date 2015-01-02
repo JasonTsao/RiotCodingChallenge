@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     # url(r'^RiotCodingChallenge/', include('RiotCodingChallenge.foo.urls')),
     url(r'^riot/api/', include('riot.urls')),
     url(r'^matches/', include('matches.urls')),
+    url(r'^auth/', include('accounts.urls')),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

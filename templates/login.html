@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block bodyContent %}
+<div id="bodycontent" style="width:100%">
+	<div id="login-container">
+            <input type="text" id="login-input" placeholder="Summoner Name"></input>
+            <button id="login-button" onclick="searchMatch()">Login</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block endScripts%}
+    <script>
+    	function searchMatch(){
+    		var url = "{% url 'accounts.views.login_func'%}" ;
+
+            var data = {
+                'username': $('#login-input').val(),
+                'region': 'na',
+                'csrfmiddlewaretoken': "{{csrf_token}}",
+            }
+
+            $.ajax({
+                    type: "POST",
+                    data: data,
+                    url: url,
+                    success: function(data) {
+                        window.location.href = "{% url 'matches.views.matchPage'%}";
+                    },error: function(data) {
+                        console.log(data);
+                    }
+            });
+            
+    	}
+    </script>
+{% endblock %}

@@ -1,0 +1,15 @@
+.teams-title-container{
+	width:100%;
+}
+
+.team-title{
+	float:left;
+	width:50%;
+	padding-left:10px;
+}
+
+.matchup-pagination{
+	position:relative;
+	z-index:20;
+	text-align:center;
+}
