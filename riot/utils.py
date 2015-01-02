@@ -42,3 +42,10 @@ def retrieveMatchDataByMatchId(region, matchId):
 	get_match_data_url = '{0}/api/lol/{1}/v2.2/match/{2}?api_key={3}'.format(RIOT_API_URL, region, matchId, api_key)
 	response = retrieveAPIData(get_match_data_url)
 	return response
+
+
+def retrieveChampionDataById(region, champId):
+	#get_champion_data_url = '{0}/api/lol/static-data/{1}/v1.2/champion/{2}?champData=all&api_key={3}'.format(RIOT_API_URL, region, champId, api_key)
+	get_champion_data_url = '{0}/api/lol/static-data/{1}/v1.2/champion/{2}?champData=spells&api_key={3}'.format(RIOT_API_URL, region, champId, api_key)
+	response = retrieveAPIData(get_champion_data_url)
+	return response

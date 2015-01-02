@@ -13,3 +13,9 @@
 	z-index:20;
 	text-align:center;
 }
+
+.team-carousel-display {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}

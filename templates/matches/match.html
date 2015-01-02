@@ -68,42 +68,64 @@
         });
     }
 
+    function getLatestCDNVersion(){
+        
+        var check_url = 'http://ddragon.leagueoflegends.com/realms/na.json';
+    }
+
     function setCurrentMatchData(match_data){
-        console.log(match_data);
-
-
         /* SET CHALENGER SWIPER*/
-        var swiper_wrapper_id = '#challenger-swiper-wrapper';
-        var swiper_wrapper = $(swiper_wrapper_id);
+        var challenger_data = match_data.matchup.challenger;
+        var opponent_data = match_data.matchup.opponent;
+        var swiper_challenger_wrapper = $('#challenger-swiper-wrapper');
+        var swiper_opponent_wrapper = $('#opponent-swiper-wrapper');
 
-        var pagination_id = '#pagination-challenger';
+        var img_src_url = 'http://ddragon.leagueoflegends.com/cdn/3.15.5/img/champion/';
 
-        console.log('team');
-        console.log(match_data.response.participants);
-
-        /*for(picture in data.user_images){
-            var picture_data = data.user_images[picture];
-            var swiper_container = $('.swiper-container');
+        for(challenger in challenger_data){
+            var swiper_container = $('#swiper-container-challenger');
             var swiper_slide = $('<div class="swiper-slide"/>');
-
-            var img_text = '<img class="collection-carousel-display"/>';
+            var img_text = '<img class="team-carousel-display"/>';
             var slide_img = $(img_text);
+            var no_space_summoner_name = challenger_data[challenger].champion_name.replace(/ /g,'');
 
-            slide_img.attr('src', picture_data['standard_resolution']);
-
+            slide_img.attr('src', img_src_url + no_space_summoner_name + '.png');
             //IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_id);
             slide_img.css({'max-height':'100%', 'max-width':'100%'});
 
             swiper_slide.append(slide_img);
-            swiper_wrapper.append(swiper_slide);
-        }*/
+            swiper_challenger_wrapper.append(swiper_slide);
+        }
+
+        for(opponent in opponent_data){
+            var swiper_container = $('#swiper-container-opponent');
+            var swiper_slide = $('<div class="swiper-slide"/>');
+            var img_text = '<img class="team-carousel-display"/>';
+            var slide_img = $(img_text);
+            var no_space_summoner_name = opponent_data[opponent].champion_name.replace(/ /g,'');
+
+            slide_img.attr('src', img_src_url + no_space_summoner_name + '.png');
+            //IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_id);
+            slide_img.css({'max-height':'100%', 'max-width':'100%'});
+
+            swiper_slide.append(slide_img);
+            swiper_opponent_wrapper.append(swiper_slide);
+        }
 
         var challengerSwiper = new Swiper('#swiper-container-challenger',{
             mode: 'horizontal',
             calculateHeight:true,
             loop: true,
-            //pagination: '.pagination',
-            pagination: pagination_id,
+            pagination: '#pagination-challenger',
+            paginationClickable: true,
+            autoResize:false,
+        });
+
+        var opponentSwiper = new Swiper('#swiper-container-opponent',{
+            mode: 'horizontal',
+            calculateHeight:true,
+            loop: true,
+            pagination: '#pagination-opponent',
             paginationClickable: true,
             autoResize:false,
         });

@@ -135,6 +135,9 @@ INSTALLED_APPS = (
     'south',
     'matches',
     'riot',
+    'summoners',
+    'champions',
+    'static_data',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
