@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block bodyContent %}
+<div id="bodycontent" style="width:100%">
+	<div id="search-bar-container">
+            <input type="text" id="submission-search-bar" placeholder="Search for matches by summoner name currently in game"></input>
+            <button id="submission-search-button" onclick="searchMatch()">Search</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block endScripts%}
+    <script>
+    	function searchMatch(){
+    		var url = "{% url 'matches.views.matchPage'%}";
+            url += '?matchId=' + $('#submission-search-bar').val()
+            window.location.href = url;
+    	}
+    </script>
+{% endblock %}

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+	{% load staticfiles %}
+	<meta charset="utf-8">
+	<!--<meta name="viewport" content="width=640, initial-scale=1">-->
+	<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,height=device-height">
+	<meta name="apple-mobile-web-app-capable" content="yes"/>
+	<title>Leage of Legends Matches{% if page_name %} - {{page_name}}{% endif %}</title>
+
+	<!--<meta name="viewport" content="width=640; initial-scale=1; maximum-scale=1; minimum-scale=1; user-scalable=0;" />-->
+
+	<!--<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">-->
+	<!--<meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1.0,maximum-scale=1.0" />-->
+	<!--jquery-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+	</script>
+	<!--jquery mobile library-->
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>
+	<!--Bootstrap CSS & JS-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<!-- Mean Menu CSS & JS -->
+	<script src="{% static 'js/jquery.meanmenu.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/meanmenu.css' %}" media="all" />
+	<!-- Swiper CSS & JS -->
+	<link rel="stylesheet" href="{% static 'css/idangerous.swiper.css' %}">
+	<link rel="stylesheet" href="{% static 'css/riot_test.css' %}">
+	<link rel="stylesheet" href="{% static 'css/riot_test_mobile.css' %}">
+	<script defer src="{% static 'js/idangerous.swiper.js' %}"></script>
+	<!--Open Sans from Google Fonts-->
+	<link href='http://fonts.googleapis.com/css?family=Oxygen:700,400|Open+Sans:400,800,700,600,300' rel='stylesheet' type='text/css'>
+	{% block additionalHead %}{% endblock %}
+</head>
+<body>
+	<div id="globalwrap" data-roll="page">
+		<div class="website-logo" onclick="mainPage()"><span style="font-weight:800;color:white;position:">L</span><span style="color:#FF5930">O</span><span style="color:#FF9900">L</span><span style="color:#00CC00">Match</span></div>
+		<header>
+			<nav>
+				<ul>
+					<li><a onclick="matches()">Matches</a></li>
+					<li><a onclick="users()">Users</a></li>
+				</ul>
+			</nav>
+		</header>
+		<div class="base-bodycontent">
+			{% block bodyContent %}{% endblock %}
+		</div>
+	</div>
+
+</body>
+	{% block endScripts %}{% endblock %}
+	<script>
+	$(document).ready(function() {
+			$("#topmenu-options").on("click", function() {
+				if(height === 0) {height = 200;}
+				else {height = 0;}
+				$('.base-bodycontent').css({marginTop: height});
+			});
+			$(".meanmenu-reveal").on("click", function() {
+				if(height === 0) {height = 200;}
+				else {height = 0;}
+				$('.base-bodycontent').css({marginTop: height});
+			});
+			viewPortHeight = $(window).height();
+
+
+			$(document).click(function(e) {
+				if($(e.target).attr('class') != "meanmenu-reveal meanclose" && !$(e.target).is('span')){
+					if($('.meanmenu-reveal').hasClass('meanclose')){
+						$('.meanmenu-reveal').click();
+					}
+				}
+				else{
+					console.log('did click meanmenu reveal');
+				}
+			});
+		});
+		jQuery(document).ready(function() {
+			jQuery('header nav').meanmenu();
+		})
+	</script>
+</html>
