@@ -9,11 +9,11 @@
 {% block bodyContent %}
 <div id="bodycontent" style="width:100%">
 	<div class="teams-title-container">
-        <div class="team-title">
-            <h1>Challenger</h1>
+        <div class="team-title team-title-selected" onclick="toggleTeamView('challenger')" id="challenger-title">
+            <h5>Challenger</h5>
         </div>
-        <div class="team-title">
-            <h1>Opponent</h1>
+        <div class="team-title" onclick="toggleTeamView('opponent')" id="opponent-title">
+            <h5>Opponent</h5>
         </div>
 
         <div class="matchup-container" id="challenger-matchup-container">
@@ -54,6 +54,25 @@
         })
         getCurrentMatchData();
     });
+
+    function toggleTeamView(mode){
+        if (mode == 'challenger'){
+
+            $('#challenger-matchup-container').removeClass('hidden-container');
+            $('#opponent-title').removeClass('team-title-selected');
+
+            $('#opponent-matchup-container').addClass('hidden-container');
+            $('#challenger-title').addClass('team-title-selected');
+        }
+        else if (mode == 'opponent'){
+
+            $('#opponent-matchup-container').removeClass('hidden-container');
+            $('#challenger-title').removeClass('team-title-selected');
+
+            $('#challenger-matchup-container').addClass('hidden-container');
+            $('#opponent-title').addClass('team-title-selected');
+        }
+    }
 
     function getCurrentMatchData(){
         $.ajax({
@@ -119,6 +138,8 @@
             pagination: '#pagination-challenger',
             paginationClickable: true,
             autoResize:false,
+            resizeReInit:true,
+            updateOnImagesReady:true,
         });
 
         var opponentSwiper = new Swiper('#swiper-container-opponent',{
@@ -128,8 +149,12 @@
             pagination: '#pagination-opponent',
             paginationClickable: true,
             autoResize:false,
+            resizeReInit:true,
+            updateOnImagesReady:true,
         });
 
+
+        $('#opponent-matchup-container').addClass('hidden-container');
         /* SET OPPONENT SWIPER*/
     }
 
