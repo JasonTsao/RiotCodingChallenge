@@ -405,11 +405,12 @@ footer ul li {
 }
 
 .right-profile-picture{
-	position: fixed;
+	position: absolute;
 	z-index: 100000000;
 	text-shadow: none;
-	right: 0px;
+	right: 5px;
 	top: 5px;
+	text-align:right;
 	color: white;
 }
 
