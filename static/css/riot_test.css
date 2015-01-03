@@ -302,3 +302,7 @@ input[type=checkbox]{
 .header-profile-container{
 	float:right;
 }
+
+#error-message h5{
+	color:#FF0000 ;
+}

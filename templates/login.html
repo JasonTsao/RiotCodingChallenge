@@ -6,12 +6,22 @@
 	<div id="login-container">
             <input type="text" id="login-input" placeholder="Summoner Name"></input>
             <button id="login-button" onclick="searchMatch()">Login</button>
+            <div id="error-message">
+                <h5></h5>
+            </div>
     </div>
 </div>
 {% endblock %}
 
 {% block endScripts%}
     <script>
+        $(document).keypress(function(e) {
+            if(e.which == 13) {
+                searchMatch();
+            }
+        });
+
+
     	function searchMatch(){
     		var url = "{% url 'accounts.views.login_func'%}" ;
 
@@ -26,9 +36,17 @@
                     data: data,
                     url: url,
                     success: function(data) {
-                        window.location.href = "{% url 'matches.views.matchPage'%}";
+                        if (data.success){
+                            window.location.href = "{% url 'matches.views.matchPage'%}";  
+                        }
+                        else{
+                            $('#error-message').children('h5').html(data.msg);
+                            $('#error-message').css('display', 'block');
+                        }
+                        
                     },error: function(data) {
                         console.log(data);
+
                     }
             });
             

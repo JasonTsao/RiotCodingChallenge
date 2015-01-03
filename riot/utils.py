@@ -45,6 +45,7 @@ def retrieveMatchHistoryBySummonerId(region, summonerId):
 	try:
 		return_value = response['matches'][0]
 	except:
+		print response
 		return_value = response
 	return return_value
 

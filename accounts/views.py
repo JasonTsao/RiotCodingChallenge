@@ -46,13 +46,16 @@ def login_func(request):
 
 					if next:
 						rtn_dict['next'] = next
+					rtn_dict['success'] = True
 				else:
 					print 'user is none!'
 			except Exception as e:
 				print 'Unable to get login: {0}'.format(e)
 		else:
 			print 'Username is not a real username'
+			rtn_dict['msg'] = 'Username is not a real username'
 	else:
 		print 'No username provided'
+		rtn_dict['msg'] = 'Username is not a real username'
 
 	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
