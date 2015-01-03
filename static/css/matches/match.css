@@ -40,6 +40,7 @@
 
 .player-data-container{
 	height:15%;
+	padding:5px;
 }
 
 .champion-img-container{
@@ -49,16 +50,18 @@
 
 .icon-image-container{
 	float:left;
+	margin-top:3px;
 }
 
 .icon-image-container img{
-	padding:5px;
+	height:96px;
+
 }
 
 .spell-container{
 	height:48px;
 	width:48px;
-	margin:3px;
+	margin:3px 5px;
 	background-color:#333;
 }
 
