@@ -51,6 +51,10 @@ header {
 	float:left;
 }
 
+.header-profile-picture-container{
+	text-align:left;
+}
+
 .header-profile-picture-container img{
 	height:40px;
 	width:40px;
