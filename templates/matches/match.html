@@ -79,7 +79,6 @@
             type: "GET",
             url: "{% url 'riot.api.getUserMatchData'%}",
             success: function(data) {
-                console.log(data);
                 setCurrentMatchData(data);
             },error: function(data) {
                 console.log(data);
@@ -99,6 +98,62 @@
         }
 
         return str;
+    }
+
+    function getImageIndex(swiper, swiper_id, url, img_type){
+        var swiper_obj = $(swiper_id);
+        var swiper_wrapper = swiper_obj.children('.swiper-wrapper');
+        var swiper_slides = swiper_wrapper.children('.swiper-slide:not(.swiper-slide-duplicate)');
+        var img_index;
+        var img_index_count = 0;
+
+        swiper_slides.each(function(){
+
+            if(img_type == 'background'){
+                img = $(this).children('.champion-img-container').children('img');
+            }
+            else if(img_type == 'icon'){
+                img = $(this).children('.player-data-container').children('.icon-image-container').children('img');
+            }
+            
+            if(img.attr('src') == url){
+                img_index = img_index_count
+            }
+            else{
+                img_index_count++;
+            }
+        })
+
+        return img_index;
+    }
+
+    function validImageCallback(url, answer, swiper_id, slide_img, img_type){
+
+        if(answer == false){
+            swiper = $(swiper_id);
+            var image_index = getImageIndex(swiper, swiper_id, url, img_type);
+
+            if(image_index === undefined){
+                console.log('failed to remove slide for swiper: ' + swiper_id + ' : ' + url);
+            }
+            else{
+                console.log('bad image at index: ' + image_index + ' : ' + url);
+                //swiper.removeSlide(image_index);
+            }
+        }
+        else{
+            if(img_type == 'background'){
+                slide_img.width($('#bodycontent').width());
+            }
+            
+        }
+    }
+
+    function IsValidImageUrl(url, callback, swiper_id, slide_img, img_type) {
+        var img = new Image();
+        img.onerror = function() { callback(url, false, swiper_id, slide_img, img_type); }
+        img.onload =  function() { callback(url, true, swiper_id, slide_img, img_type); }
+        img.src = url;
     }
     
 
@@ -145,7 +200,6 @@
         var no_space_summoner_name = toTitleCase(player_data.champion_name);
 
         no_space_summoner_name = no_space_summoner_name.replace(/ /g,'').replace(/'/g, '');
-        console.log(no_space_summoner_name);
 
         player_icon_img.attr('src', icon_img_src_url + no_space_summoner_name + '.png');
         player_icon_img_container.append(player_icon_img);
@@ -158,7 +212,6 @@
 
         slide_background_img.attr('src', "{% static 'img/teal.jpg' %}");
 
-        //IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_id);
         champion_name.html(player_data.champion_name);
         champion_name_container.append(champion_name);
 
@@ -207,6 +260,10 @@
         swiper_slide.append(slide_background_img_container);
 
         swiper_wrapper.append(swiper_slide);
+
+        //check if the big image for this champion is a real image
+        IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_text, slide_img, 'background');
+        IsValidImageUrl(player_icon_img.attr('src'),validImageCallback, swiper_container_text, player_icon_img, 'icon');
     }
 
     function setCurrentMatchData(match_data){
