@@ -2,6 +2,7 @@ from RiotCodingChallenge.settings import RIOT_KEY as api_key
 import json
 import urllib
 import urllib2
+import logging
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader, Context, RequestContext
@@ -19,6 +20,7 @@ TEST_SUMMONER_ID_2 = '19926474'
 
 RIOT_API_URL = 'https://na.api.pvp.net'
 
+logger = logging.getLogger("django.request")
 
 '''
 	SUMMONER API CALLS
@@ -240,6 +242,7 @@ def getUserMatchData(request):
 				rtn_dict['matchup'] = matchup_dict
 	except Exception as e :
 		print 'Unable to grab user data: {0}'.format(e)
+		logger.info('Unable to grab user data: {0}'.format(e))
 
 	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
 
