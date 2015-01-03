@@ -93,7 +93,7 @@
     }
 
     function toTitleCase(str){
-        if(!str.indexOf(' ') != -1)
+        if(str.indexOf(' ') == -1)
         {
             return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
         }
@@ -145,6 +145,7 @@
         var no_space_summoner_name = toTitleCase(player_data.champion_name);
 
         no_space_summoner_name = no_space_summoner_name.replace(/ /g,'').replace(/'/g, '');
+        console.log(no_space_summoner_name);
 
         player_icon_img.attr('src', icon_img_src_url + no_space_summoner_name + '.png');
         player_icon_img_container.append(player_icon_img);
