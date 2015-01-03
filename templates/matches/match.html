@@ -175,7 +175,7 @@
         var summoner_level_container = $('<div class="summoner-level">');
         var spells_container = $('<div class="spells-container"/>');
         var basic_info_container = $('<div class="basic-data-container"/>');
-        var season_tier_container = $('<div class="season-tier-container"/>')
+        var season_tier_container = $('<div class="basic-info-text"/>')
 
         var summoner_name_container = $('<div class="basic-info-text">');
         var champion_name_container = $('<div class="champion-name-container"/>');
@@ -184,7 +184,7 @@
         var kda_ratio_container = $('<div class="basic-info-text">');
 
         var champion_name = $('<h5/>');
-        var summoner_name = $('<h6/>');
+        var summoner_name = $('<h4/>');
         var summoner_level = $('<h6/>');
         var wins = $('<h6/>');
         var ranked_wins = $('<h6/>');
@@ -242,8 +242,9 @@
 
         wins.html('Wins      ' + player_data['wins']);
         ranked_wins.html('Ranked    ' + player_data['ranked_wins']);
-        kda_ratio.html('KDA       ' + player_data['kda']);
         season_tier.html(player_data['highestAchievedSeasonTier']);
+
+        kda_ratio.html('KDA       ' + player_data['kda']);
 
         summoner_name_container.append(summoner_name);
         summoner_level_container.append(summoner_level);
@@ -254,15 +255,16 @@
         season_tier_container.append(season_tier);
 
         basic_info_container.append(summoner_name_container);
+        basic_info_container.append(season_tier_container);
         basic_info_container.append(wins_container);
         basic_info_container.append(ranked_wins_container);
-        basic_info_container.append(kda_ratio_container);
+        //basic_info_container.append(kda_ratio_container);
+        
         
         player_data_container.append(player_icon_img_container);
         player_data_container.append(summoner_level_container);
         player_data_container.append(spells_container);
         player_data_container.append(basic_info_container);
-        player_data_container.append(season_tier_container);
 
         swiper_slide.append(player_data_container)
 

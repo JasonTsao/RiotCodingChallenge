@@ -45,7 +45,6 @@
 }
 
 .champion-img-container{
-	height:75%;
 	z-index:-1;
 }
 
@@ -68,24 +67,16 @@
 
 .basic-info-text{
 	width:100%;
-}
-
-.basic-info-text h6{
 	color:#fff;
 }
 
-.season-tier-container{
-	float:right;
-}
-
-.season-tier-container h6{
-	color:#fff;
+.basic-info-text h4{
+	margin-top: 2px;
 }
 
 .basic-data-container{
 	float:left;
 	max-width:200px;
-
 }
 
 .spell-container{
