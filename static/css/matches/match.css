@@ -38,7 +38,25 @@
 	top:0;
 }
 
+.player-data-container{
+	height:25%;
+}
+
+.icon-image-container{
+	float:left;
+}
+
 .icon-image-container img{
 	padding:5px;
-	max-height:40%;
+}
+
+.spell-container{
+	height:24px;
+	width:24px;
+	margin:3px;
+	background-color:#333;
+}
+
+.spells-container{
+	float:left;
 }
