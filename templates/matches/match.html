@@ -92,6 +92,10 @@
         var check_url = 'http://ddragon.leagueoflegends.com/realms/na.json';
     }
 
+    function toTitleCase(str){
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    }
+
     function setSlideData(swiper_container_text, swiper_wrapper, player_data){
 
         var icon_img_src_url = 'http://ddragon.leagueoflegends.com/cdn/3.15.5/img/champion/';
@@ -101,7 +105,7 @@
         var swiper_slide = $('<div class="swiper-slide"/>');
         var img_text = '<img class="team-carousel-display"/>';
         var slide_img = $(img_text);
-        var no_space_summoner_name = player_data.champion_name.replace(/ /g,'');
+        var no_space_summoner_name = player_data.champion_name.replace(/ /g,'').replace(/'/g, '');
         var slide_image_container = $('<div class="champion-img-container"/>');
         var slide_background_img_container = $('<div class="background-image-container"/>');
         var slide_background_img = $('<img/>');
@@ -131,6 +135,8 @@
 
         var spell_one_img = $('<img/>');
         var spell_two_img = $('<img/>');
+
+        no_space_summoner_name = toTitleCase(no_space_summoner_name);
 
         player_icon_img.attr('src', icon_img_src_url + no_space_summoner_name + '.png');
         player_icon_img_container.append(player_icon_img);
