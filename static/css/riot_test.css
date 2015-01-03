@@ -41,14 +41,10 @@ header {
 }
 
 .header-profile-container{
-	width:45px;
-	height:45px;
 	float:right;
 }
 
 .header-profile-picture-container{
-	width:40px;
-	float:left;
 }
 
 .header-profile-picture-container img{

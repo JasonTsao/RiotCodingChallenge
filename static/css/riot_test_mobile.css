@@ -41,14 +41,11 @@ header {
 }
 
 .header-profile-container{
-	width:45px;
-	height:45px;
 	float:right;
 }
 
 .header-profile-picture-container{
-	width:40px;
-	float:left;
+
 }
 
 .header-profile-picture-container{
@@ -414,7 +411,8 @@ footer ul li {
 	text-shadow: none;
 	right: 5px;
 	top: 5px;
-	text-align:right;
+	overflow:hidden;
+	width:auto;
 	color: white;
 }
 
