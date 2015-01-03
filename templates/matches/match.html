@@ -112,13 +112,13 @@
             var slide_background_img_container = $('<div class="background-image-container"/>');
             var slide_background_img = $('<img/>');
 
-            /*var player_icon_img_container = $('<div class="icon-image-container"/>');
+            var player_icon_img_container = $('<div class="icon-image-container"/>');
             var player_icon_img = $('<img/>');
 
             player_icon_img.attr('src', icon_img_src_url + no_space_summoner_name + '.png');
             player_icon_img.css({'max-height':'100%', 'max-width':'100%'});
             player_icon_img_container.append(player_icon_img);
-            swiper_slide.append(player_icon_img_container);*/
+            swiper_slide.append(player_icon_img_container);
 
             slide_img.attr('src', img_src_url + no_space_summoner_name + '_0.jpg');
             slide_img.css({'max-height':'100%', 'max-width':'100%'});
@@ -148,6 +148,14 @@
             var slide_image_container = $('<div/>');
             var slide_background_img_container = $('<div class="background-image-container"/>');
             var slide_background_img = $('<img/>')
+
+            var player_icon_img_container = $('<div class="icon-image-container"/>');
+            var player_icon_img = $('<img/>');
+
+            player_icon_img.attr('src', icon_img_src_url + no_space_summoner_name + '.png');
+            player_icon_img.css({'max-height':'100%', 'max-width':'100%'});
+            player_icon_img_container.append(player_icon_img);
+            swiper_slide.append(player_icon_img_container);
 
             //IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_id);
             slide_img.attr('src', img_src_url + no_space_summoner_name + '_0.jpg');
