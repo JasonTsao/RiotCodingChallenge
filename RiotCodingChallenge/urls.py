@@ -9,12 +9,14 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
+    (r'^$', 'matches.views.login'),
     url(r'^admin/', include(admin.site.urls)),
     # url(r'^$', 'RiotCodingChallenge.views.home', name='home'),
     # url(r'^RiotCodingChallenge/', include('RiotCodingChallenge.foo.urls')),
     url(r'^riot/api/', include('riot.urls')),
     url(r'^matches/', include('matches.urls')),
     url(r'^auth/', include('accounts.urls')),
+    url(r'^logout$', 'django.contrib.auth.views.logout', {'next_page': '/'}),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
