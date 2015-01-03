@@ -105,8 +105,13 @@
         var slide_image_container = $('<div class="champion-img-container"/>');
         var slide_background_img_container = $('<div class="background-image-container"/>');
         var slide_background_img = $('<img/>');
-        var player_data_container = $('<div class="player-data-container">');
-        var spells_container = $('<div class="spells-container">');
+        var player_data_container = $('<div class="player-data-container"/>');
+        var spells_container = $('<div class="spells-container"/>');
+        var basic_info_container = $('<div class="basic-data-container"/>');
+        var summoner_name_container = $('<div class="basic-info-text summoner-name">');
+        var summoner_level_container = $('<div class="basic-info-text summoner-level">');
+        var summoner_name = $('<h6/>');
+        var summoner_level = $('<h6/>');
 
         var player_icon_img_container = $('<div class="icon-image-container"/>');
         var player_icon_img = $('<img/>');
@@ -137,14 +142,25 @@
         spells_container.append(spell_one);
         spells_container.append(spell_two);
 
+
+        console.log(player_data);
+        summoner_name.html(player_data.player.summonerName);
+        //summoner_level.html();
+
+        summoner_name_container.append(summoner_name);
+        summoner_level_container.append(summoner_level);
+
+        basic_info_container.append(summoner_name_container);
+        basic_info_container.append(summoner_level_container);
+
         player_data_container.append(player_icon_img_container);
         player_data_container.append(spells_container);
+        player_data_container.append(basic_info_container);
 
         swiper_slide.append(player_data_container)
 
         swiper_slide.append(slide_image_container);
         swiper_slide.append(slide_background_img_container);
-            
 
         swiper_wrapper.append(swiper_slide);
     }

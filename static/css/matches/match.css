@@ -58,6 +58,18 @@
 
 }
 
+.basic-info-text{
+	width:100%;
+}
+
+.basic-info-text h6{
+	color:#fff;
+}
+
+.basic-data-container{
+	float:left;
+}
+
 .spell-container{
 	height:48px;
 	width:48px;
