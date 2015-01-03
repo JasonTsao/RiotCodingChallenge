@@ -37,6 +37,13 @@
 <body>
 	<div id="globalwrap" data-roll="page">
 		<div class="website-logo" onclick="mainPage()"><span style="font-weight:800;color:white;position:">L</span><span style="color:#FF5930">O</span><span style="color:#FF9900">L</span><span style="color:#00CC00">Match</span></div>
+		{% if user.is_authenticated %}
+		<div class="header-profile-container right-profile-picture">
+            <div class="header-profile-picture-container">
+            	<h5>{{user}}</h5>
+            </div>
+        </div>
+		{% endif %}
 		<header>
 			<nav>
 				<ul>

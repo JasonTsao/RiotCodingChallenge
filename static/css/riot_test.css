@@ -298,3 +298,7 @@ input[type=checkbox]{
 .ui-mobile .ui-page-active {
 	min-height: 100%;
 }
+
+.header-profile-container{
+	float:right;
+}
