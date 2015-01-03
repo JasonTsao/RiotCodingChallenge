@@ -106,12 +106,20 @@
         var slide_background_img_container = $('<div class="background-image-container"/>');
         var slide_background_img = $('<img/>');
         var player_data_container = $('<div class="player-data-container"/>');
+        var summoner_level_container = $('<div class="summoner-level">');
         var spells_container = $('<div class="spells-container"/>');
         var basic_info_container = $('<div class="basic-data-container"/>');
-        var summoner_name_container = $('<div class="basic-info-text summoner-name">');
-        var summoner_level_container = $('<div class="summoner-level">');
+
+        var summoner_name_container = $('<div class="basic-info-text">');
+        var wins_container = $('<div class="basic-info-text">');
+        var ranked_wins_container = $('<div class="basic-info-text">');
+        var kda_ratio_container = $('<div class="basic-info-text">');
+
         var summoner_name = $('<h6/>');
         var summoner_level = $('<h6/>');
+        var wins = $('<h6/>');
+        var ranked_wins = $('<h6/>');
+        var kda_ratio = $('<h6/>');
 
         var player_icon_img_container = $('<div class="icon-image-container"/>');
         var player_icon_img = $('<img/>');
@@ -141,17 +149,30 @@
         spells_container.append(spell_one);
         spells_container.append(spell_two);
 
-
-        console.log(player_data);
         summoner_name.html(player_data.player.summonerName);
         summoner_level.html(player_data.summonerLevel);
+
+        /* replace with adaptive data!*/
+        player_data['wins'] = 1239;
+        player_data['ranked_wins'] = 242
+        player_data['kda'] = '7.2/4.6/10.2';
+
+        wins.html('Wins      ' + player_data['wins']);
+        ranked_wins.html('Ranked    ' + player_data['ranked_wins']);
+        kda_ratio.html('KDA       ' + player_data['kda']);
 
         summoner_name_container.append(summoner_name);
         summoner_level_container.append(summoner_level);
 
-        //player_icon_img_container.append(summoner_level_container);
+        wins_container.append(wins);
+        ranked_wins_container.append(ranked_wins);
+        kda_ratio_container.append(kda_ratio);
 
         basic_info_container.append(summoner_name_container);
+        basic_info_container.append(wins_container);
+        basic_info_container.append(ranked_wins_container);
+        basic_info_container.append(kda_ratio_container);
+
         
         player_data_container.append(player_icon_img_container);
         player_data_container.append(summoner_level_container);
