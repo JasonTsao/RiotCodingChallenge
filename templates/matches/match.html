@@ -99,7 +99,8 @@
         var swiper_challenger_wrapper = $('#challenger-swiper-wrapper');
         var swiper_opponent_wrapper = $('#opponent-swiper-wrapper');
 
-        var img_src_url = 'http://ddragon.leagueoflegends.com/cdn/3.15.5/img/champion/';
+        var icon_img_src_url = 'http://ddragon.leagueoflegends.com/cdn/3.15.5/img/champion/';
+        var img_src_url = 'http://ddragon.leagueoflegends.com/cdn/img/champion/splash/';
 
         for(challenger in challenger_data){
             var swiper_container = $('#swiper-container-challenger');
@@ -107,12 +108,32 @@
             var img_text = '<img class="team-carousel-display"/>';
             var slide_img = $(img_text);
             var no_space_summoner_name = challenger_data[challenger].champion_name.replace(/ /g,'');
+            var slide_image_container = $('<div/>');
+            var slide_background_img_container = $('<div class="background-image-container"/>');
+            var slide_background_img = $('<img/>');
+            var player_icon_img_container = $('<div class="icon-image-container"/>');
+            var player_icon_img = $('<img/>');
 
-            slide_img.attr('src', img_src_url + no_space_summoner_name + '.png');
             //IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_id);
+            player_icon_img.attr('src', icon_img_src_url + no_space_summoner_name + '.png');
+            player_icon_img.css({'max-height':'100%', 'max-width':'100%'});
+
+            slide_img.attr('src', img_src_url + no_space_summoner_name + '_0.jpg');
             slide_img.css({'max-height':'100%', 'max-width':'100%'});
 
-            swiper_slide.append(slide_img);
+            slide_background_img.attr('src', "{% static 'img/League-of-Legends-Game-Logo.jpg' %}");
+
+
+            player_icon_img_container.append(player_icon_img);
+            console.log(player_icon_img_container);
+            slide_background_img_container.append(slide_background_img);
+            slide_image_container.append(slide_img)
+
+            swiper_slide.append(player_icon_img_container);
+            swiper_slide.append(slide_image_container);
+            swiper_slide.append(slide_background_img_container);
+            
+
             swiper_challenger_wrapper.append(swiper_slide);
         }
 
@@ -123,11 +144,23 @@
             var slide_img = $(img_text);
             var no_space_summoner_name = opponent_data[opponent].champion_name.replace(/ /g,'');
 
-            slide_img.attr('src', img_src_url + no_space_summoner_name + '.png');
+            var slide_image_container = $('<div/>');
+            var slide_background_img_container = $('<div class="background-image-container"/>');
+            var slide_background_img = $('<img/>')
+
             //IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_id);
+            slide_img.attr('src', img_src_url + no_space_summoner_name + '_0.jpg');
+            
             slide_img.css({'max-height':'100%', 'max-width':'100%'});
 
-            swiper_slide.append(slide_img);
+            slide_background_img.attr('src', "{% static 'img/League-of-Legends-Game-Logo.jpg' %}");
+            
+            slide_background_img_container.append(slide_background_img);
+            slide_image_container.append(slide_img)
+
+            swiper_slide.append(slide_image_container);
+            swiper_slide.append(slide_background_img_container);
+
             swiper_opponent_wrapper.append(swiper_slide);
         }
 

@@ -31,3 +31,13 @@
 .hidden-container{
 	display:none;
 }
+
+.background-image-container img{
+	z-index:-2;
+	position:absolute;
+	top:0;
+}
+
+.icon-image-container img{
+	position:absolute;
+}
