@@ -19,3 +19,20 @@ class Spell(models.Model):
 	image_full = models.CharField(max_length=255, blank=True)
 	image_sprite = models.CharField(max_length=255, blank=True)
 	image_group = models.CharField(max_length=255, blank=True)
+
+	def __unicode__(self):
+		return self.name
+
+
+class GeneralSpell(models.Model):
+	spellId = models.IntegerField(unique=True)
+	name = models.CharField(max_length=255, blank=True)
+	summonerLevel = models.IntegerField(null=True,blank=True)
+	description = models.TextField()
+	key = models.CharField(max_length=255, blank=True)
+	image_full = models.CharField(max_length=255, blank=True)
+	image_sprite = models.CharField(max_length=255, blank=True)
+	image_group = models.CharField(max_length=255, blank=True)
+
+	def __unicode__(self):
+		return self.name

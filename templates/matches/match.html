@@ -161,6 +161,8 @@
 
         var icon_img_src_url = 'http://ddragon.leagueoflegends.com/cdn/3.15.5/img/champion/';
         var img_src_url = 'http://ddragon.leagueoflegends.com/cdn/img/champion/splash/';
+        //var spell_img_src_url = "url('//ddragon.leagueoflegends.com/cdn/4.21.5/img/sprite/spell0.png')";
+        var spell_img_src_url = 'http://ddragon.leagueoflegends.com/cdn/4.21.5/img/spell/';
 
         var swiper_container = $(swiper_container_text);
         var swiper_slide = $('<div class="swiper-slide"/>');
@@ -193,8 +195,11 @@
         var spell_one = $('<div class="spell-container spell-one-image-container"/>');
         var spell_two = $('<div class="spell-container spell-two-image-container"/>');
 
-        var spell_one_img = $('<img/>');
-        var spell_two_img = $('<img/>');
+        /*var spell_one_img = $('<div class="spell-img"/>');
+        var spell_two_img = $('<div class="spell-img"/>');*/
+
+        var spell_one_img = $('<img class="spell-img"/>');
+        var spell_two_img = $('<img class="spell-img"/>');
 
         //var no_space_summoner_name = player_data.champion_name.replace(/ /g,'').replace(/'/g, '');
         var no_space_summoner_name = toTitleCase(player_data.champion_name);
@@ -203,6 +208,28 @@
 
         player_icon_img.attr('src', icon_img_src_url + no_space_summoner_name + '.png');
         player_icon_img_container.append(player_icon_img);
+
+        spell_one_img.addClass('spell-' + player_data.spell1);
+        spell_two_img.addClass('spell-' + player_data.spell2);
+
+        /*var spellOnePosition = (player_data.spell1 % 10) * -48
+        var spellTwoPosition = (player_data.spell2 % 10) * -48
+
+        var spellOneRowPosition = 0;
+        var spellTwoRowPosition = 0;
+
+        if (player_data.spell1 >10){
+            spellOneRowPosition = -48;
+        }
+        if (player_data.spell2 > 10){
+            spellTwoRowPosition = -48;
+        }
+
+        spell_one_img.css('background', spell_img_src_url + ' ' + spellOnePosition + 'px ' + spellOneRowPosition  + 'px no-repeat');
+        spell_two_img.css('background', spell_img_src_url + ' ' + spellTwoPosition + 'px ' + spellTwoRowPosition + 'px no-repeat');*/
+
+        spell_one_img.attr('src', spell_img_src_url + player_data.spell1 + '.png');
+        spell_two_img.attr('src', spell_img_src_url + player_data.spell2 + '.png');
 
         spell_one.append(spell_one_img);
         spell_two.append(spell_two_img);

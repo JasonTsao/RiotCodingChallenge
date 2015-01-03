@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from utils import *
 
 from accounts.models import Account
-from champions.models import Champion, Spell
+from champions.models import Champion, Spell, GeneralSpell
 from summoners.models import Summoner
 
 TEST_SUMMONER_ID = '37490585'
@@ -186,6 +186,8 @@ def getUserMatchData(request):
 				for participant in matchData['participants']:
 					participant_dict = {}
 					champion_name = False
+
+					#Get Champion name
 					try:
 						champion_name = Champion.objects.get(champion_id=participant['championId']).name
 
@@ -202,6 +204,7 @@ def getUserMatchData(request):
 					participant_dict['id'] = participant['participantId']
 					participant_dict['player'] = matchData['participantIdentities'].pop(0)['player']
 
+					#Get specific Summoner Data
 					try:
 						summoner = Summoner.objects.get(summonerId=participant_dict['player']['summonerId'])
 						participant_dict['summonerLevel'] = summoner.summonerLevel
@@ -209,11 +212,46 @@ def getUserMatchData(request):
 						#collect summonerIds we don't have info on so we can use 1 call to riot instead of multiple
 						summonerIdsArray.append(str(participant_dict['player']['summonerId']))
 
+
+					#Add Summoner Spells and Masteries to return dict
+					try:
+						spell = GeneralSpell.objects.get(spellId=participant['spell1Id'])
+						participant_dict['spell1'] = spell.key
+					except:
+						try:
+							response = retrieveSpellDataById(region, participant['spell1Id'])
+							spell = GeneralSpell(spellId=response['id'],name=response['name'], key=response['key'], description=response['description'],
+												summonerLevel=response['summonerLevel'])
+							spell.save()
+							participant_dict['spell1'] = spell.key
+						except Exception as e:
+							print e
+							participant_dict['spell1'] = ''
+
+					try:
+						spell = GeneralSpell.objects.get(spellId=participant['spell2Id'])
+						participant_dict['spell2'] = spell.key
+					except:
+						try:
+							response = retrieveSpellDataById(region, participant['spell2Id'])
+							spell = GeneralSpell(spellId=response['id'],name=response['name'], key=response['key'], description=response['description'],
+												summonerLevel=response['summonerLevel'])
+							spell.save()
+							participant_dict['spell2'] = spell.key
+						except:
+							participant_dict['spell2'] = ''
+
+					participant_dict['highestAchievedSeasonTier'] = participant['highestAchievedSeasonTier']
+
+
+					#Add participant dict to return dict
 					if participant['participantId'] < 6:
 						matchup_dict['opponent'].append(participant_dict)
 					else:
 						matchup_dict['challenger'].append(participant_dict)
 
+
+				#Save personal summoner data and put info into return dict
 				if len(summonerIdsArray) > 0:
 					summonerIds = ','.join(summonerIdsArray)
 					basicSummonerStats = retrieveBasicStatsBySummonerId(region, summonerIds)
@@ -226,7 +264,8 @@ def getUserMatchData(request):
 						for participant in matchup_dict['challenger']:
 							if str(participant['player']['summonerId']) == str(k):
 								participant['summonerLevel'] = v['summonerLevel']
-								summoner = Summoner(name=v['name'], summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], revisionDate=v['revisionDate'])
+								summoner = Summoner(name=v['name'], summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], 
+													revisionDate=v['revisionDate'], highestAchievedSeasonTier=participant['highestAchievedSeasonTier'])
 								summoner.save()
 								break
 
@@ -234,7 +273,8 @@ def getUserMatchData(request):
 							for participant in matchup_dict['opponent']:
 								if str(participant['player']['summonerId']) == str(k):
 									participant['summonerLevel'] = v['summonerLevel']
-									summoner = Summoner(name=v['name'], summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], revisionDate=v['revisionDate'])
+									summoner = Summoner(name=v['name'], summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], 
+														revisionDate=v['revisionDate'], highestAchievedSeasonTier=participant['highestAchievedSeasonTier'])
 									summoner.save()
 									break
 

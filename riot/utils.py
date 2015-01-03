@@ -37,6 +37,12 @@ def retrieveStatsBySummonerId(region, summonerIds):
 	return response
 
 
+def retrieveSpellDataById(region, spellId):
+	get_summoner_stats_url = '{0}/api/lol/static-data/{1}/v1.2/summoner-spell/{2}?api_key={3}'.format(RIOT_API_URL, region, spellId, api_key)
+	response = retrieveAPIData(get_summoner_stats_url)
+	return response
+
+
 def retrieveMatchHistoryBySummonerId(region, summonerId):
 	get_summoner_match_history_url = '{0}/api/lol/{1}/v2.2/matchhistory/{2}?api_key={3}&beginIndex=0&endIndex=1'.format(RIOT_API_URL, region, summonerId, api_key)
 	response = retrieveAPIData(get_summoner_match_history_url)
