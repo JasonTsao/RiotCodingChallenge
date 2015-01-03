@@ -26,6 +26,11 @@ def retrieveSummonerbyName(region, summonerNames):
 	return response
 
 
+def retrieveBasicStatsBySummonerId(region, summonerIds):
+	get_basic_summoner_stats_url = '{0}/api/lol/{1}/v1.4/summoner/{2}?api_key={3}'.format(RIOT_API_URL, region, summonerIds, api_key)
+	response = retrieveAPIData(get_basic_summoner_stats_url)
+	return response
+
 def retrieveStatsBySummonerId(region, summonerIds):
 	get_summoner_stats_url = '{0}/api/lol/{1}/v1.3/stats/by-summoner/{2}/summary?api_key={3}'.format(RIOT_API_URL, region, summonerIds, api_key)
 	response = retrieveAPIData(get_summoner_stats_url)
@@ -35,7 +40,13 @@ def retrieveStatsBySummonerId(region, summonerIds):
 def retrieveMatchHistoryBySummonerId(region, summonerId):
 	get_summoner_match_history_url = '{0}/api/lol/{1}/v2.2/matchhistory/{2}?api_key={3}&beginIndex=0&endIndex=1'.format(RIOT_API_URL, region, summonerId, api_key)
 	response = retrieveAPIData(get_summoner_match_history_url)
-	return response['matches'][0]
+
+	return_value = ''
+	try:
+		return_value = response['matches'][0]
+	except:
+		return_value = response
+	return return_value
 
 
 def retrieveMatchDataByMatchId(region, matchId):

@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class Summoner(models.Model):
-    username = models.CharField(max_length=255, blank=True)
+    name = models.CharField(max_length=255, blank=True)
     summonerId = models.CharField(max_length=255, blank=True)
     summonerLevel = models.IntegerField(blank=True, null=True)
     rank = models.CharField(max_length=255, blank=True)
@@ -11,7 +11,7 @@ class Summoner(models.Model):
     active = models.BooleanField(default=True)
 
     def __unicode__(self):
-        return self.user.username
+        return self.name
 
 	class Meta:
-		unique_together = (('username', 'summoner_id'),)
+		unique_together = (('name', 'summoner_id'),)

@@ -80,3 +80,16 @@
 .spells-container{
 	float:left;
 }
+
+.summoner-level{
+	position:absolute;
+	margin-top:70px;
+	margin-left:70px;
+	width:15px;
+	background-color:#333;
+}
+
+.summoner-level h6{
+	color:#fff;
+	margin:0px auto;
+}

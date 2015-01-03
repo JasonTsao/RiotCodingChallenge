@@ -109,7 +109,7 @@
         var spells_container = $('<div class="spells-container"/>');
         var basic_info_container = $('<div class="basic-data-container"/>');
         var summoner_name_container = $('<div class="basic-info-text summoner-name">');
-        var summoner_level_container = $('<div class="basic-info-text summoner-level">');
+        var summoner_level_container = $('<div class="summoner-level">');
         var summoner_name = $('<h6/>');
         var summoner_level = $('<h6/>');
 
@@ -124,7 +124,6 @@
 
         player_icon_img.attr('src', icon_img_src_url + no_space_summoner_name + '.png');
         player_icon_img_container.append(player_icon_img);
-        
 
         spell_one.append(spell_one_img);
         spell_two.append(spell_two_img);
@@ -145,15 +144,17 @@
 
         console.log(player_data);
         summoner_name.html(player_data.player.summonerName);
-        //summoner_level.html();
+        summoner_level.html(player_data.summonerLevel);
 
         summoner_name_container.append(summoner_name);
         summoner_level_container.append(summoner_level);
 
-        basic_info_container.append(summoner_name_container);
-        basic_info_container.append(summoner_level_container);
+        //player_icon_img_container.append(summoner_level_container);
 
+        basic_info_container.append(summoner_name_container);
+        
         player_data_container.append(player_icon_img_container);
+        player_data_container.append(summoner_level_container);
         player_data_container.append(spells_container);
         player_data_container.append(basic_info_container);
 

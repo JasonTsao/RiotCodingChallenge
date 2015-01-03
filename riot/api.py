@@ -12,6 +12,7 @@ from utils import *
 
 from accounts.models import Account
 from champions.models import Champion, Spell
+from summoners.models import Summoner
 
 TEST_SUMMONER_ID = '37490585'
 TEST_SUMMONER_ID_2 = '19926474'
@@ -53,6 +54,34 @@ def getSummonerByName(request, summonerNames):
 '''
 	STATS API CALLS
 '''
+
+def getBasicStatsBySummonerId(request, summonerIds):
+	'''
+		API call for getting a summoners basic stats by summoner ID from Riot API
+
+		Input:
+			summonerIds: summoner IDs to use to query 
+
+		Output:
+			json dict with basic summoner stats
+	'''
+	rtn_dict = {"success": False, "msg": ""}
+
+	region = request.GET.get('region', 'na')
+
+	if region and summonerIds:
+
+		response = retrieveBasicStatsBySummonerId(region, summonerIds)
+
+		if type(response) is dict:
+			rtn_dict['response'] = response
+		else:
+			rtn_dict['msg'] = response
+			rtn_dict['response'] = {}
+	else:
+		rtn_dict['msg'] = 'Malformed request url'
+	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
+
 
 def getStatsBySummonerId(request, summonerIds):
 	'''
@@ -137,6 +166,7 @@ def getUserMatchData(request):
 		account = Account.objects.get(user=request.user)
 		#region = account.region
 		region = 'na'
+		summonerIdsArray = []
 		summonerName = account.username
 
 		if region and summonerName:
@@ -144,11 +174,12 @@ def getUserMatchData(request):
 
 			if type(response) is dict:
 				summonerId = response[summonerName]['id']
+
 				matchHistory = retrieveMatchHistoryBySummonerId(region, summonerId)
 				matchId = matchHistory['matchId']
 
 				matchData = retrieveMatchDataByMatchId(region, matchId)
-
+				rtn_dict['matchData'] = matchData
 
 				for participant in matchData['participants']:
 					participant_dict = {}
@@ -169,10 +200,41 @@ def getUserMatchData(request):
 					participant_dict['id'] = participant['participantId']
 					participant_dict['player'] = matchData['participantIdentities'].pop(0)['player']
 
+					try:
+						summoner = Summoner.objects.get(summonerId=participant_dict['player']['summonerId'])
+						participant_dict['summonerLevel'] = summoner.summonerLevel
+					except:
+						#collect summonerIds we don't have info on so we can use 1 call to riot instead of multiple
+						summonerIdsArray.append(str(participant_dict['player']['summonerId']))
+
 					if participant['participantId'] < 6:
-						matchup_dict['challenger'].append(participant_dict)
-					else:
 						matchup_dict['opponent'].append(participant_dict)
+					else:
+						matchup_dict['challenger'].append(participant_dict)
+
+				if len(summonerIdsArray) > 0:
+					summonerIds = ','.join(summonerIdsArray)
+					basicSummonerStats = retrieveBasicStatsBySummonerId(region, summonerIds)
+
+					#I realize running this forloop to fill it up isn't the most efficient way but since it'll always be only 
+					#10 players I figure this time should be short
+
+					for k, v in basicSummonerStats.items():
+						summoner = False
+						for participant in matchup_dict['challenger']:
+							if str(participant['player']['summonerId']) == str(k):
+								participant['summonerLevel'] = v['summonerLevel']
+								summoner = Summoner(name=v['name'], summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], revisionDate=v['revisionDate'])
+								summoner.save()
+								break
+
+						if not summoner:
+							for participant in matchup_dict['opponent']:
+								if str(participant['player']['summonerId']) == str(k):
+									participant['summonerLevel'] = v['summonerLevel']
+									summoner = Summoner(name=v['name'], summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], revisionDate=v['revisionDate'])
+									summoner.save()
+									break
 
 				#rtn_dict['response'] = matchData
 				rtn_dict['matchup'] = matchup_dict
