@@ -74,9 +74,18 @@
 	color:#fff;
 }
 
+.season-tier-container{
+	float:right;
+}
+
+.season-tier-container h6{
+	color:#fff;
+}
+
 .basic-data-container{
 	float:left;
 	max-width:200px;
+
 }
 
 .spell-container{
