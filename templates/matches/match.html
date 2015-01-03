@@ -111,10 +111,12 @@
         var basic_info_container = $('<div class="basic-data-container"/>');
 
         var summoner_name_container = $('<div class="basic-info-text">');
+        var champion_name_container = $('<div class="champion-name-container"/>');
         var wins_container = $('<div class="basic-info-text">');
         var ranked_wins_container = $('<div class="basic-info-text">');
         var kda_ratio_container = $('<div class="basic-info-text">');
 
+        var champion_name = $('<h4/>');
         var summoner_name = $('<h6/>');
         var summoner_level = $('<h6/>');
         var wins = $('<h6/>');
@@ -142,9 +144,14 @@
         slide_background_img.attr('src', "{% static 'img/teal.jpg' %}");
 
         //IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_id);
-            
+        champion_name.html(player_data.champion_name);
+        champion_name_container.append(champion_name);
+
+
         slide_background_img_container.append(slide_background_img);
+        slide_image_container.append(champion_name_container);
         slide_image_container.append(slide_img)
+        
 
         spells_container.append(spell_one);
         spells_container.append(spell_two);
