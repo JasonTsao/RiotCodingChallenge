@@ -39,7 +39,12 @@
 }
 
 .player-data-container{
-	height:25%;
+	height:15%;
+}
+
+.champion-img-container{
+	height:75%;
+	z-index:-1;
 }
 
 .icon-image-container{
@@ -51,8 +56,8 @@
 }
 
 .spell-container{
-	height:24px;
-	width:24px;
+	height:48px;
+	width:48px;
 	margin:3px;
 	background-color:#333;
 }
