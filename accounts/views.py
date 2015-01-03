@@ -21,6 +21,7 @@ def login_func(request):
 
 
 	if username:
+		username = username.lower()
 		response = retrieveSummonerbyName(region, username)
 		if type(response) is dict:
 			try:
