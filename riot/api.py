@@ -234,7 +234,7 @@ def getUserMatchData(request):
 					participant_dict['spell2'] = getSummonerSpell(participant['spell2Id'], region)
 					participant_dict['masteries'] = getSummonerMasteries(participant['masteries'],region)
 					participant_dict['runes'] = getSummonerRunes(participant['runes'],region)
-					participant_dict['wins'] = getSummonerNormalWins(participant_dict['player']['summonerId'],region)
+					#participant_dict['wins'] = getSummonerNormalWins(participant_dict['player']['summonerId'],region)
 
 					participant_dict['champion_name'] = champion_name
 					participant_dict['id'] = participant['participantId']
