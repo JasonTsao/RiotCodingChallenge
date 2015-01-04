@@ -253,6 +253,7 @@ def getSummonerNormalWins(summonerId, region):
 		 	for summary in response['playerStatSummaries']:
 		 		wins += summary.get('wins', 0)
 
+		 		'''
 		 		try:
 			 		summoner_summary = SummonerSummaryStats(summoner_id=summonerId,
 			 												wins=summary.get('wins', None),
@@ -269,6 +270,7 @@ def getSummonerNormalWins(summonerId, region):
 			 		summoner_summary.save()
 			 	except Exception as e:
 			 		print 'Unable to save new summoner summary: {0}'.format(e)
+			 	'''
 
  	except Exception as e:
  		print 'Error retreiving summoner: {0}'.format(e)
