@@ -297,11 +297,14 @@
         runes_section_div.append(runes_title_container);
         runes = player_data.runes
         for(rune in runes){
-            rune_container = $('<div class="basic-info-text"/>');
-            rune_text = $('<h6/>');
-            rune_text.html('+' + rune + ' ' + runes[rune].toFixed(2));
-            rune_container.append(rune_text);
-            runes_section_div.append(rune_container);
+            var rune_container = $('<div class="basic-info-text"/>');
+            var rune_text = $('<h6/>');
+
+            if( runes[rune] && !isNaN(runes[rune])){
+                rune_text.html('+' + rune + ' ' + parseFloat(runes[rune]).toFixed(2)*1);
+                rune_container.append(rune_text);
+                runes_section_div.append(rune_container); 
+            }
         }
 
         left_section_div.append(champion_name_container);

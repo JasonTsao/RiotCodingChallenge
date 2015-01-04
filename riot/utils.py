@@ -137,24 +137,27 @@ def getBasicSummonerData(summonerIdsArray, matchup_dict, region):
 	#I realize running this forloop to fill it up isn't the most efficient way but since it'll always be only 
 	#10 players I figure this time should be short
 
-	for k, v in basicSummonerStats.items():
-		summoner = False
-		for participant in matchup_dict['challenger']:
-			if str(participant['player']['summonerId']) == str(k):
-				participant['summonerLevel'] = v['summonerLevel']
-				summoner = Summoner(name=v['name'].lower(), summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], 
-									revisionDate=v['revisionDate'], highestAchievedSeasonTier=participant['highestAchievedSeasonTier'])
-				summoner.save()
-				break
-
-		if not summoner:
-			for participant in matchup_dict['opponent']:
+	if type(basicSummonerStats) is dict:
+		for k, v in basicSummonerStats.items():
+			summoner = False
+			for participant in matchup_dict['challenger']:
 				if str(participant['player']['summonerId']) == str(k):
 					participant['summonerLevel'] = v['summonerLevel']
 					summoner = Summoner(name=v['name'].lower(), summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], 
 										revisionDate=v['revisionDate'], highestAchievedSeasonTier=participant['highestAchievedSeasonTier'])
 					summoner.save()
 					break
+
+			if not summoner:
+				for participant in matchup_dict['opponent']:
+					if str(participant['player']['summonerId']) == str(k):
+						participant['summonerLevel'] = v['summonerLevel']
+						summoner = Summoner(name=v['name'].lower(), summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], 
+											revisionDate=v['revisionDate'], highestAchievedSeasonTier=participant['highestAchievedSeasonTier'])
+						summoner.save()
+						break
+	else:
+		print 'Unable to retreive basic summoner data'
 	return matchup_dict
 
 
@@ -254,26 +257,28 @@ def getSummonerNormalWins(summonerId, region):
 
 		else:
 	 		response = retrieveStatsBySummonerId(region, summonerId)
-		 	for summary in response['playerStatSummaries']:
-		 		wins += summary.get('wins', 0)
 
-		 		
-		 		try:
-			 		summoner_summary = SummonerSummaryStats(summoner_id=summonerId,
-			 												wins=summary.get('wins', None),
-			 												losses=summary.get('losses', None), 
-			 												playerStatSummaryType=summary.get('playerStatSummaryType', None))
-			 		if summary['aggregatedStats']:
-			 			aggregated_stats = summary['aggregatedStats']
-			 			summoner_summary.totalChampionKills = aggregated_stats.get('totalChampionKills', None)
-			 			summoner_summary.totalTurretsKilled = aggregated_stats.get('totalTurretsKilled', None)
-			 			summoner_summary.totalMinionKills = aggregated_stats.get('totalMinionKills', None)
-			 			summoner_summary.totalNeutralMinionsKilled = aggregated_stats.get('totalNeutralMinionsKilled', None)
-			 			summoner_summary.totalAssists = aggregated_stats.get('totalAssists', None)
+	 		if type(response) is dict:
+			 	for summary in response['playerStatSummaries']:
+			 		wins += summary.get('wins', 0)
+			 		try:
+				 		summoner_summary = SummonerSummaryStats(summoner_id=summonerId,
+				 												wins=summary.get('wins', None),
+				 												losses=summary.get('losses', None), 
+				 												playerStatSummaryType=summary.get('playerStatSummaryType', None))
+				 		if summary['aggregatedStats']:
+				 			aggregated_stats = summary['aggregatedStats']
+				 			summoner_summary.totalChampionKills = aggregated_stats.get('totalChampionKills', None)
+				 			summoner_summary.totalTurretsKilled = aggregated_stats.get('totalTurretsKilled', None)
+				 			summoner_summary.totalMinionKills = aggregated_stats.get('totalMinionKills', None)
+				 			summoner_summary.totalNeutralMinionsKilled = aggregated_stats.get('totalNeutralMinionsKilled', None)
+				 			summoner_summary.totalAssists = aggregated_stats.get('totalAssists', None)
 
-			 		summoner_summary.save()
-			 	except Exception as e:
-			 		print 'Unable to save new summoner summary: {0}'.format(e)
+				 		summoner_summary.save()
+				 	except Exception as e:
+				 		print 'Unable to save new summoner summary: {0}'.format(e)
+			else:
+				print response
 
 
  	except Exception as e:
