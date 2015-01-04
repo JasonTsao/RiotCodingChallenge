@@ -82,6 +82,7 @@
 
 .basic-info-text h4{
 	margin-top: 2px;
+	overflow:hidden;
 }
 
 .basic-info-text h6{
