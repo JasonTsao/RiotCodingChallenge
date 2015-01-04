@@ -26,6 +26,10 @@
 .team-carousel-display {
 	display: block;
 	margin: 0px auto;
+	max-width:100%;
+	position:absolute;
+	left:0px;
+	z-index:-1;
 }
 
 .hidden-container{
@@ -46,13 +50,12 @@
 
 .champion-img-container{
 	z-index:-1;
+	clear:both;
 }
 
-.champion-name-container{
-	position:absolute;
+.title-container{
 	color:#fff;
-	margin-left:10px;
-	margin-top:10px;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 
 .icon-image-container{
@@ -68,6 +71,7 @@
 .basic-info-text{
 	width:100%;
 	color:#fff;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 
 .basic-info-text h4{
@@ -106,4 +110,21 @@
 .spell-img{
 	height:45px;
 	width:45px;
+}
+
+.left-side-div{
+	float:left;
+	width:50%;
+	padding:10px;
+}
+
+.right-side-div{
+	float:right;
+	width:50%;
+	padding:10px;
+}
+
+.right-side-div-small{
+	width:100%;
+	float:left;
 }

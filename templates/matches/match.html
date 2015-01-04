@@ -137,6 +137,7 @@
                 console.log('failed to remove slide for swiper: ' + swiper_id + ' : ' + url);
             }
             else{
+                $('#opponent-matchup-container').addClass('hidden-container');
                 console.log('bad image at index: ' + image_index + ' : ' + url);
                 //swiper.removeSlide(image_index);
             }
@@ -157,33 +158,19 @@
     }
     
 
-    function setSlideData(swiper_container_text, swiper_wrapper, player_data){
-
-        var icon_img_src_url = 'http://ddragon.leagueoflegends.com/cdn/3.15.5/img/champion/';
-        var img_src_url = 'http://ddragon.leagueoflegends.com/cdn/img/champion/splash/';
-        //var spell_img_src_url = "url('//ddragon.leagueoflegends.com/cdn/4.21.5/img/sprite/spell0.png')";
+    function setPlayerContainerSection(swiper_container_text, swiper_slide, player_data, no_space_champion_name){
         var spell_img_src_url = 'http://ddragon.leagueoflegends.com/cdn/4.21.5/img/spell/';
+        var icon_img_src_url = 'http://ddragon.leagueoflegends.com/cdn/3.15.5/img/champion/';
 
-        var swiper_container = $(swiper_container_text);
-        var swiper_slide = $('<div class="swiper-slide"/>');
-        var img_text = '<img class="team-carousel-display"/>';
-        var slide_img = $(img_text);
-        var slide_image_container = $('<div class="champion-img-container"/>');
-        var slide_background_img_container = $('<div class="background-image-container"/>');
-        var slide_background_img = $('<img/>');
         var player_data_container = $('<div class="player-data-container"/>');
         var summoner_level_container = $('<div class="summoner-level">');
         var spells_container = $('<div class="spells-container"/>');
         var basic_info_container = $('<div class="basic-data-container"/>');
-        var season_tier_container = $('<div class="basic-info-text"/>')
-
+        var season_tier_container = $('<div class="basic-info-text"/>');
         var summoner_name_container = $('<div class="basic-info-text">');
-        var champion_name_container = $('<div class="champion-name-container"/>');
         var wins_container = $('<div class="basic-info-text">');
         var ranked_wins_container = $('<div class="basic-info-text">');
-        var kda_ratio_container = $('<div class="basic-info-text">');
 
-        var champion_name = $('<h5/>');
         var summoner_name = $('<h4/>');
         var summoner_level = $('<h6/>');
         var wins = $('<h6/>');
@@ -197,17 +184,10 @@
         var spell_one = $('<div class="spell-container spell-one-image-container"/>');
         var spell_two = $('<div class="spell-container spell-two-image-container"/>');
 
-        /*var spell_one_img = $('<div class="spell-img"/>');
-        var spell_two_img = $('<div class="spell-img"/>');*/
-
         var spell_one_img = $('<img class="spell-img"/>');
         var spell_two_img = $('<img class="spell-img"/>');
 
-        var no_space_summoner_name = toTitleCase(player_data.champion_name);
-
-        no_space_summoner_name = no_space_summoner_name.replace(/ /g,'').replace(/'/g, '');
-
-        player_icon_img.attr('src', icon_img_src_url + no_space_summoner_name + '.png');
+        player_icon_img.attr('src', icon_img_src_url + no_space_champion_name + '.png');
         player_icon_img_container.append(player_icon_img);
 
         spell_one_img.attr('src', spell_img_src_url + player_data.spell1 + '.png');
@@ -215,19 +195,6 @@
 
         spell_one.append(spell_one_img);
         spell_two.append(spell_two_img);
-
-        slide_img.attr('src', img_src_url + no_space_summoner_name + '_0.jpg');
-        slide_img.css({'max-height':'100%', 'max-width':'100%'});
-
-        slide_background_img.attr('src', "{% static 'img/teal.jpg' %}");
-
-        champion_name.html(player_data.champion_name);
-        champion_name_container.append(champion_name);
-
-        slide_background_img_container.append(slide_background_img);
-        slide_image_container.append(champion_name_container);
-        slide_image_container.append(slide_img)
-        
 
         spells_container.append(spell_one);
         spells_container.append(spell_two);
@@ -251,7 +218,7 @@
 
         wins_container.append(wins);
         ranked_wins_container.append(ranked_wins);
-        kda_ratio_container.append(kda_ratio);
+        //kda_ratio_container.append(kda_ratio);
         season_tier_container.append(season_tier);
 
         basic_info_container.append(summoner_name_container);
@@ -266,16 +233,131 @@
         player_data_container.append(spells_container);
         player_data_container.append(basic_info_container);
 
-        swiper_slide.append(player_data_container)
+        IsValidImageUrl(player_icon_img.attr('src'),validImageCallback, swiper_container_text, player_icon_img, 'icon');
 
+        return player_data_container;
+    }
+
+    function setBottomSection(swiper_container_text, swiper_slide, player_data, no_space_champion_name){
+        var img_src_url = 'http://ddragon.leagueoflegends.com/cdn/img/champion/splash/';
+
+        var img_text = '<img class="team-carousel-display"/>';
+        var slide_img = $(img_text);
+        var slide_image_container = $('<div class="champion-img-container"/>');
+        var left_section_div = $('<div class="left-side-div"/>');
+        var right_section_div = $('<div class="right-side-div"/>');
+        var masteries_section_div = $('<div class="right-side-div-small">');
+        var runes_section_div = $('<div class="right-side-div-small">');
+
+        var champion_name_container = $('<div class="title-container"/>');
+        var masteries_title_container = $('<div class="title-container">');
+        var runes_title_container = $('<div class="title-container">');
+
+        var masteries_text_container = $('<div class="basic-info-text"/>');
+        var runes_attack_damage_container = $('<div class="basic-info-text"/>');
+        var runes_magic_resist_container = $('<div class="basic-info-text"/>');
+        var runes_mana_regen_container = $('<div class="basic-info-text"/>');
+        var runes_armor_container = $('<div class="basic-info-text"/>');
+        var runes_ability_power_container = $('<div class="basic-info-text"/>');
+        var runes_life_steal_container = $('<div class="basic-info-text"/>');
+        
+        var champion_name = $('<h4/>');
+        var masteries_title = $('<h4/>');
+        var runes_title = $('<h4/>');
+        var masteries_text = $('<h6/>');
+        var runes_attack_damage = $('<h6/>');
+        var runes_magic_resist = $('<h6/>');
+        var runes_mana_regen = $('<h6/>');
+        var runes_armor = $('<h6/>');
+        var runes_ability_power = $('<h6/>');
+        var runes_life_steal= $('<h6/>');
+        
+        //FAKE DATA
+        player_data['runes'] = {};
+        player_data['runes']['attack_damage'] = 10.8;
+        player_data['runes']['magic_resist'] = 7.7;
+        player_data['runes']['mana_regen'] = 2.3;
+        player_data['runes']['armor'] = 5;
+        player_data['runes']['ability_power'] = 0;
+        player_data['runes']['life_steal'] = 0;
+
+        console.log(player_data['runes']['attack_damage']);
+
+        runes_title.html('Runes');
+        runes_attack_damage.html('Atk Dmg: ' + player_data['runes']['attack_damage']);
+        runes_magic_resist.html('Mgc Resist: ' + player_data['runes']['magic_resist']);
+        runes_mana_regen.html('Mana Regen: ' + player_data['runes']['mana_regen']);
+        runes_armor.html('Armor: ' + player_data['runes']['armor']);
+        runes_ability_power.html('AP: ' + player_data['runes']['ability_power']);
+        runes_life_steal.html('Life Steal: ' + player_data['runes']['life_steal']);
+
+        slide_img.attr('src', img_src_url + no_space_champion_name + '_0.jpg');
+        slide_img.css({'max-width':'100%', 'z-index': -1});
+
+        champion_name.html(player_data.champion_name);
+        champion_name_container.append(champion_name);
+
+        masteries_title.html('Masteries');
+        masteries_text.html(player_data['masteries']);
+
+        masteries_title_container.append(masteries_title);
+        masteries_text_container.append(masteries_text);
+
+        masteries_section_div.append(masteries_title_container);
+        masteries_section_div.append(masteries_text_container);
+
+        runes_title_container.append(runes_title);
+        runes_attack_damage_container.append(runes_attack_damage);
+        runes_magic_resist_container.append(runes_magic_resist);
+        runes_mana_regen_container.append(runes_mana_regen);
+        runes_armor_container.append(runes_armor);
+        runes_ability_power_container.append(runes_ability_power);
+        runes_life_steal_container.append(runes_life_steal);
+
+
+
+
+        runes_section_div.append(runes_title_container);
+        runes_section_div.append(runes_attack_damage_container);
+        runes_section_div.append(runes_magic_resist_container);
+        runes_section_div.append(runes_mana_regen_container);
+        runes_section_div.append(runes_armor_container);
+        runes_section_div.append(runes_ability_power_container);
+        runes_section_div.append(runes_life_steal_container);
+
+        left_section_div.append(champion_name_container);
+        right_section_div.append(masteries_section_div);
+        right_section_div.append(runes_section_div);
+
+        slide_image_container.append(left_section_div);
+        slide_image_container.append(right_section_div);
+        slide_image_container.append(slide_img);
+
+        IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_text, slide_img, 'background');
+        return slide_image_container;
+    }
+
+    function setSlideData(swiper_container_text, swiper_wrapper, player_data){
+        var swiper_container = $(swiper_container_text);
+        var swiper_slide = $('<div class="swiper-slide"/>');
+
+        var slide_background_img_container = $('<div class="background-image-container"/>');
+        var slide_background_img = $('<img/>');
+
+        slide_background_img.attr('src', "{% static 'img/teal.jpg' %}");
+        slide_background_img_container.append(slide_background_img);
+
+        var no_space_champion_name = toTitleCase(player_data.champion_name);
+        no_space_champion_name = no_space_champion_name.replace(/ /g,'').replace(/'/g, '');
+
+        player_data_container = setPlayerContainerSection(swiper_container_text, swiper_slide, player_data, no_space_champion_name);
+        slide_image_container = setBottomSection(swiper_container_text, swiper_slide, player_data, no_space_champion_name);
+
+        swiper_slide.append(player_data_container)
         swiper_slide.append(slide_image_container);
         swiper_slide.append(slide_background_img_container);
 
         swiper_wrapper.append(swiper_slide);
-
-        //check if the big image for this champion is a real image
-        IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_text, slide_img, 'background');
-        IsValidImageUrl(player_icon_img.attr('src'),validImageCallback, swiper_container_text, player_icon_img, 'icon');
     }
 
     function setCurrentMatchData(match_data){

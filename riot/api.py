@@ -243,6 +243,8 @@ def getUserMatchData(request):
 
 					participant_dict['highestAchievedSeasonTier'] = participant['highestAchievedSeasonTier']
 
+					participant_dict['masteries'] = '21/9/0';
+
 
 					#Add participant dict to return dict
 					if participant['participantId'] < 6:
