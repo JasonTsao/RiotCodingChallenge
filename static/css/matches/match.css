@@ -128,12 +128,18 @@
 	float:left;
 	width:50%;
 	padding:10px;
+	opacity:0.8;
+	border-radius:10px;
+	background-color:#000;
 }
 
 .right-side-div{
 	float:right;
 	width:50%;
 	padding:10px;
+	opacity:0.8;
+	border-radius:10px;
+	background-color:#000;
 }
 
 .right-side-div-small{
