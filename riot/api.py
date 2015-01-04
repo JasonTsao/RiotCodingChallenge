@@ -177,33 +177,21 @@ def getUserMatchData(request):
 			if type(response) is dict:
 				summonerId = response[summonerName]['id']
 
+				#Get most recent match
 				matchHistory = retrieveMatchHistoryBySummonerId(region, summonerId)
 				matchId = matchHistory['matchId']
 
+				#Get more relevant data about the most recent match
 				matchData = retrieveMatchDataByMatchId(region, matchId)
 				rtn_dict['matchData'] = matchData
 
+				#Create usable data for each participant in the match
 				for participant in matchData['participants']:
 					participant_dict = {}
-					champion_name = False
-
 					#Get Champion name
-					try:
-						champion_name = Champion.objects.get(champion_id=participant['championId']).name
+					champion_name = getChampionName(participant['championId'], region)
 
-					except:
-						response = retrieveChampionDataById(region, participant['championId'])
-						if type(response) is dict:
-							champion = Champion(champion_id=participant['championId'], name=response['name'], title=response['title'])
-							champion.save()
-							champion_name = champion.name
-						else:
-							rtn_dict['msg'] = response
-
-					participant_dict['champion_name'] = champion_name
-					participant_dict['id'] = participant['participantId']
 					participant_dict['player'] = matchData['participantIdentities'].pop(0)['player']
-
 					#Get specific Summoner Data
 					try:
 						summoner = Summoner.objects.get(summonerId=participant_dict['player']['summonerId'])
@@ -214,37 +202,14 @@ def getUserMatchData(request):
 
 
 					#Add Summoner Spells and Masteries to return dict
-					try:
-						spell = GeneralSpell.objects.get(spellId=participant['spell1Id'])
-						participant_dict['spell1'] = spell.key
-					except:
-						try:
-							response = retrieveSpellDataById(region, participant['spell1Id'])
-							spell = GeneralSpell(spellId=response['id'],name=response['name'], key=response['key'], description=response['description'],
-												summonerLevel=response['summonerLevel'])
-							spell.save()
-							participant_dict['spell1'] = spell.key
-						except Exception as e:
-							print e
-							participant_dict['spell1'] = ''
+					participant_dict['spell1'] = getSummonerSpell(participant['spell1Id'], region)
+					participant_dict['spell2'] = getSummonerSpell(participant['spell2Id'], region)
+					participant_dict['masteries'] = getSummonerMasteries(participant['masteries'],region)
+					participant_dict['runes'] = getSummonerRunes(participant['runes'],region)
 
-					try:
-						spell = GeneralSpell.objects.get(spellId=participant['spell2Id'])
-						participant_dict['spell2'] = spell.key
-					except:
-						try:
-							response = retrieveSpellDataById(region, participant['spell2Id'])
-							spell = GeneralSpell(spellId=response['id'],name=response['name'], key=response['key'], description=response['description'],
-												summonerLevel=response['summonerLevel'])
-							spell.save()
-							participant_dict['spell2'] = spell.key
-						except:
-							participant_dict['spell2'] = ''
-
+					participant_dict['champion_name'] = champion_name
+					participant_dict['id'] = participant['participantId']
 					participant_dict['highestAchievedSeasonTier'] = participant['highestAchievedSeasonTier']
-
-					participant_dict['masteries'] = '21/9/0';
-
 
 					#Add participant dict to return dict
 					if participant['participantId'] < 6:
@@ -252,33 +217,9 @@ def getUserMatchData(request):
 					else:
 						matchup_dict['challenger'].append(participant_dict)
 
-
 				#Save personal summoner data and put info into return dict
 				if len(summonerIdsArray) > 0:
-					summonerIds = ','.join(summonerIdsArray)
-					basicSummonerStats = retrieveBasicStatsBySummonerId(region, summonerIds)
-
-					#I realize running this forloop to fill it up isn't the most efficient way but since it'll always be only 
-					#10 players I figure this time should be short
-
-					for k, v in basicSummonerStats.items():
-						summoner = False
-						for participant in matchup_dict['challenger']:
-							if str(participant['player']['summonerId']) == str(k):
-								participant['summonerLevel'] = v['summonerLevel']
-								summoner = Summoner(name=v['name'], summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], 
-													revisionDate=v['revisionDate'], highestAchievedSeasonTier=participant['highestAchievedSeasonTier'])
-								summoner.save()
-								break
-
-						if not summoner:
-							for participant in matchup_dict['opponent']:
-								if str(participant['player']['summonerId']) == str(k):
-									participant['summonerLevel'] = v['summonerLevel']
-									summoner = Summoner(name=v['name'], summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], 
-														revisionDate=v['revisionDate'], highestAchievedSeasonTier=participant['highestAchievedSeasonTier'])
-									summoner.save()
-									break
+					matchup_dict = getBasicSummonerData(summonerIdsArray, matchup_dict, region)
 
 				#rtn_dict['response'] = matchData
 				rtn_dict['matchup'] = matchup_dict
@@ -302,6 +243,19 @@ def getChampionDataById(request, championId):
 
 		if type(response) is dict:
 			print response
+		rtn_dict['response'] = response
+
+	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
+
+
+def getAndStoreAllMasteries(request):
+	rtn_dict = {"success": False, "msg": ""}
+
+	region = request.GET.get('region', 'na')
+
+	if region:
+		response = getAndStoreMasteries(region)
+
 		rtn_dict['response'] = response
 
 	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
