@@ -139,4 +139,5 @@
 .right-side-div-small{
 	width:100%;
 	float:left;
+	overflow:hidden;
 }
