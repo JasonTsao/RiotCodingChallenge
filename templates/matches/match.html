@@ -257,26 +257,13 @@
         var wins_as_champion_container = $('<div class="basic-info-text"/>');
         var kda_container = $('<div class="basic-info-text"/>');
         var masteries_text_container = $('<div class="basic-info-text"/>');
-        var runes_attack_damage_container = $('<div class="basic-info-text"/>');
-        var runes_magic_resist_container = $('<div class="basic-info-text"/>');
-        var runes_mana_regen_container = $('<div class="basic-info-text"/>');
-        var runes_armor_container = $('<div class="basic-info-text"/>');
-        var runes_ability_power_container = $('<div class="basic-info-text"/>');
-        var runes_life_steal_container = $('<div class="basic-info-text"/>');
-        
+
         var champion_name = $('<h4/>');
         var masteries_title = $('<h4/>');
         var runes_title = $('<h4/>');
         var wins_as_champion = $('<h6/>');
         var kda = $('<h6/>');
         var masteries_text = $('<h6/>');
-        var runes_attack_damage = $('<h6/>');
-        var runes_magic_resist = $('<h6/>');
-        var runes_mana_regen = $('<h6/>');
-        var runes_armor = $('<h6/>');
-        var runes_ability_power = $('<h6/>');
-        var runes_life_steal= $('<h6/>');
-        
 
         slide_img.attr('src', img_src_url + no_space_champion_name + '_0.jpg');
         slide_img.css({'max-width':'100%', 'z-index': -1});
@@ -284,14 +271,6 @@
         champion_name.html(player_data.champion_name);
         champion_name_container.append(champion_name);
 
-        //FAKE DATA
-        player_data['runes'] = {};
-        player_data['runes']['attack_damage'] = 10.8;
-        player_data['runes']['magic_resist'] = 7.7;
-        player_data['runes']['mana_regen'] = 2.3;
-        player_data['runes']['armor'] = 5;
-        player_data['runes']['ability_power'] = 0;
-        player_data['runes']['life_steal'] = 0;
         player_data['kda'] = '27.0/10.4/3.1';
         player_data['wins_as_champion'] = 102;
         
@@ -302,12 +281,6 @@
         masteries_text.html(player_data['masteries']);
 
         runes_title.html('Runes');
-        runes_attack_damage.html('+attack damage ' + player_data['runes']['attack_damage']);
-        runes_magic_resist.html('+magic resist ' + player_data['runes']['magic_resist']);
-        runes_mana_regen.html('+mana_regen ' + player_data['runes']['mana_regen']);
-        runes_armor.html('+armor ' + player_data['runes']['armor']);
-        runes_ability_power.html('+ap ' + player_data['runes']['ability_power']);
-        runes_life_steal.html('+life steal ' + player_data['runes']['life_steal']);
 
         //append h6's to their containers
         wins_as_champion_container.append(wins_as_champion);
@@ -315,12 +288,6 @@
         masteries_title_container.append(masteries_title);
         masteries_text_container.append(masteries_text);
         runes_title_container.append(runes_title);
-        runes_attack_damage_container.append(runes_attack_damage);
-        runes_magic_resist_container.append(runes_magic_resist);
-        runes_mana_regen_container.append(runes_mana_regen);
-        runes_armor_container.append(runes_armor);
-        runes_ability_power_container.append(runes_ability_power);
-        runes_life_steal_container.append(runes_life_steal);
 
         //append divs to masteries section
         masteries_section_div.append(masteries_title_container);
@@ -328,12 +295,14 @@
 
         //append divs to rune section
         runes_section_div.append(runes_title_container);
-        runes_section_div.append(runes_attack_damage_container);
-        runes_section_div.append(runes_magic_resist_container);
-        runes_section_div.append(runes_mana_regen_container);
-        runes_section_div.append(runes_armor_container);
-        runes_section_div.append(runes_ability_power_container);
-        runes_section_div.append(runes_life_steal_container);
+        runes = player_data.runes
+        for(rune in runes){
+            rune_container = $('<div class="basic-info-text"/>');
+            rune_text = $('<h6/>');
+            rune_text.html('+' + rune + ' ' + runes[rune].toFixed(2));
+            rune_container.append(rune_text);
+            runes_section_div.append(rune_container);
+        }
 
         left_section_div.append(champion_name_container);
         left_section_div.append(wins_as_champion_container);
