@@ -62,10 +62,13 @@ def retrieveMatchHistoryBySummonerId(region, summonerId):
 	response = retrieveAPIData(get_summoner_match_history_url)
 
 	return_value = ''
-	try:
-		return_value = response['matches'][0]
-	except:
-		print response
+
+	if type(response) is dict:
+		try:
+			return_value = response['matches'][0]
+		except:
+			return_value = response
+	else:
 		return_value = response
 	return return_value
 
@@ -299,49 +302,8 @@ def getSummonerNormalWins(summonerId, region):
 
 		#if player_stats['kills'] and player_stats['deaths'] and player_stats['assists']:
 		if player_stats['kills'] and player_stats['assists']:
-			kda = ["%.2f" % (player_stats['kills']/num_games), "%.2f" % (player_stats['deaths']/num_games), "%.2f" % (player_stats['assists']/num_games)]
+			kda = ["%.1f" % (player_stats['kills']/num_games), "%.1f" % (player_stats['deaths']/num_games), "%.1f" % (player_stats['assists']/num_games)]
 			player_stats['kda'] = '/'.join(kda)
-
-
-	 	'''
-	 	if len(summoner_games) > 0:
-		 	for game in summoner_games:
-		 		wins += game.wins
-
-		else:
-	 		response = retrieveStatsBySummonerId(region, summonerId)
-
-	 		if type(response) is dict:
-			 	for summary in response['playerStatSummaries']:
-			 		wins += summary.get('wins', 0)
-			 		try:
-				 		summoner_summary = SummonerSummaryStats(summoner_id=summonerId,
-				 												wins=summary.get('wins', None),
-				 												losses=summary.get('losses', None), 
-				 												playerStatSummaryType=summary.get('playerStatSummaryType', None))
-				 		if summary['aggregatedStats']:
-				 			aggregated_stats = summary['aggregatedStats']
-				 			summoner_summary.totalChampionKills = aggregated_stats.get('totalChampionKills', None)
-				 			summoner_summary.totalTurretsKilled = aggregated_stats.get('totalTurretsKilled', None)
-				 			summoner_summary.totalMinionKills = aggregated_stats.get('totalMinionKills', None)
-				 			summoner_summary.totalNeutralMinionsKilled = aggregated_stats.get('totalNeutralMinionsKilled', None)
-				 			summoner_summary.totalAssists = aggregated_stats.get('totalAssists', None)
-				 			
-				 			summoner_summary.averageChampionsKilled = aggregated_stats.get('averageChampionsKilled', None)
-				 			summoner_summary.averageNumDeaths = aggregated_stats.get('averageNumDeaths', None)
-				 			summoner_summary.averageAssists = aggregated_stats.get('averageAssists', None)
-				 			
-
-				 		if summary['playerStatSummaryType'][:6] == 'Ranked':
-				 			summoner_summary.ranked = True
-
-				 		summoner_summary.save()
-				 	except Exception as e:
-				 		print 'Unable to save new summoner summary: {0}'.format(e)
-			else:
-				print response
-			'''
-
 
  	except Exception as e:
  		print 'Error retreiving summoner normal stats: {0}'.format(e)
@@ -349,21 +311,31 @@ def getSummonerNormalWins(summonerId, region):
  	#return wins
  	return player_stats
 
-def getSummonerRankedWins(summonerId, region, championId):
- 	wins = 0
+def getSummonerChampionStats(summonerId, region, championId):
+ 	ranked_player_stats = {'wins':0, 'losses':0,'kills':0.0, 'deaths':0.0, 'assists':0.0, 'kda':'n/a', 'sessions_played': 0}
 
  	try:
-	 	summoner_games = SummonerSummaryStats.objects.filter(summoner_id=summonerId, ranked=True)
-	 	if len(summoner_games) > 0:
-		 	for game in summoner_games:
-		 		wins += game.wins
+		response = retrieveRankedStatsBySummonerId(region, summonerId)
+	 	if type(response) is dict:
+	 		champion_stats = response['champions']
+	 		for champion in champion_stats:
+	 			if champion['id'] == championId:
+	 				stats = champion['stats']
+	 				num_games = stats['totalSessionsPlayed']
+	 				ranked_player_stats['wins'] = stats['totalSessionsWon']
+	 				ranked_player_stats['losses'] = stats['totalSessionsLost']
+	 				ranked_player_stats['sessions_played'] = num_games
 
-		else:
-			response = retrieveRankedStatsBySummonerId(region, summonerId)
-	 		if type(response) is dict:
-	 			pass	
+	 				ranked_player_stats['kills'] = float(stats['totalChampionKills'])/num_games
+	 				ranked_player_stats['deaths'] = float(stats['totalDeathsPerSession'])/num_games
+	 				ranked_player_stats['assists'] = float(stats['totalAssists'])/num_games
+
+	 				if ranked_player_stats['kills'] and ranked_player_stats['deaths'] and ranked_player_stats['kills']:
+						kda = ["%.1f" % (ranked_player_stats['kills']), "%.1f" % (ranked_player_stats['deaths']), "%.1f" % (ranked_player_stats['assists'])]
+						ranked_player_stats['kda'] = '/'.join(kda)
+					break
+
 	except Exception as e:
- 		print 'Error retreiving summoner normal stats: {0}'.format(e)
+ 		print 'Error retreiving summoner ranked champion stats: {0}'.format(e)
 
-
- 	return wins
+ 	return ranked_player_stats

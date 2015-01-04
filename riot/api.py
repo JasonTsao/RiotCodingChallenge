@@ -207,55 +207,59 @@ def getUserMatchData(request):
 
 				#Get most recent match
 				matchHistory = retrieveMatchHistoryBySummonerId(region, summonerId)
-				matchId = matchHistory['matchId']
 
-				#Get more relevant data about the most recent match
-				matchData = retrieveMatchDataByMatchId(region, matchId)
-				rtn_dict['matchData'] = matchData
+				if type(matchHistory) is dict:
+					matchId = matchHistory['matchId']
 
-				#Create usable data for each participant in the match
-				for participant in matchData['participants']:
-					participant_dict = {}
-					#Get Champion name
-					champion_name = getChampionName(participant['championId'], region)
+					#Get more relevant data about the most recent match
+					matchData = retrieveMatchDataByMatchId(region, matchId)
+					rtn_dict['matchData'] = matchData
 
-					participant_dict['player'] = matchData['participantIdentities'].pop(0)['player']
-					#Get specific Summoner Data
-					try:
-						summoner = Summoner.objects.get(summonerId=participant_dict['player']['summonerId'])
-						participant_dict['summonerLevel'] = summoner.summonerLevel
-					except:
-						#collect summonerIds we don't have info on so we can use 1 call to riot instead of multiple
-						summonerIdsArray.append(str(participant_dict['player']['summonerId']))
+					#Create usable data for each participant in the match
+					for participant in matchData['participants']:
+						participant_dict = {}
+						#Get Champion name
+						champion_name = getChampionName(participant['championId'], region)
+
+						participant_dict['player'] = matchData['participantIdentities'].pop(0)['player']
+						#Get specific Summoner Data
+						try:
+							summoner = Summoner.objects.get(summonerId=participant_dict['player']['summonerId'])
+							participant_dict['summonerLevel'] = summoner.summonerLevel
+						except:
+							#collect summonerIds we don't have info on so we can use 1 call to riot instead of multiple
+							summonerIdsArray.append(str(participant_dict['player']['summonerId']))
 
 
-					players_stats = {'wins':0, 'ranked_wins':0, 'wins_with_champion':0, 'kda':''}
-					#Add Summoner Spells and Masteries to return dict
-					participant_dict['spell1'] = getSummonerSpell(participant['spell1Id'], region)
-					participant_dict['spell2'] = getSummonerSpell(participant['spell2Id'], region)
-					participant_dict['masteries'] = getSummonerMasteries(participant['masteries'],region)
-					participant_dict['runes'] = getSummonerRunes(participant['runes'],region)
-					participant_dict['stats'] = getSummonerNormalWins(participant_dict['player']['summonerId'],region)
-					#participant_dict['wins'] = getSummonerNormalWins(participant_dict['player']['summonerId'],region)
-					#participant_dict['wins'] = 9000
-					#participant_dict['ranked_wins'] = getSummonerRankedWins(participant_dict['player']['summonerId'],region, participant['championId'])
+						player_stats = {'wins':0, 'ranked_wins':0, 'wins_with_champion':0, 'kda':''}
+						#Add Summoner Spells and Masteries to return dict
+						participant_dict['spell1'] = getSummonerSpell(participant['spell1Id'], region)
+						participant_dict['spell2'] = getSummonerSpell(participant['spell2Id'], region)
+						participant_dict['masteries'] = getSummonerMasteries(participant['masteries'],region)
+						participant_dict['runes'] = getSummonerRunes(participant['runes'],region)
+						participant_dict['stats'] = getSummonerNormalWins(participant_dict['player']['summonerId'],region)
 
-					participant_dict['champion_name'] = champion_name
-					participant_dict['id'] = participant['participantId']
-					participant_dict['highestAchievedSeasonTier'] = participant['highestAchievedSeasonTier']
+						#participant_dict['ranked_wins'] = getSummonerRankedWins(participant_dict['player']['summonerId'],region, participant['championId'])
+						participant_dict['champion_stats'] = getSummonerChampionStats(participant_dict['player']['summonerId'],region, participant['championId'])
 
-					#Add participant dict to return dict
-					if participant['participantId'] < 6:
-						matchup_dict['opponent'].append(participant_dict)
-					else:
-						matchup_dict['challenger'].append(participant_dict)
+						participant_dict['champion_name'] = champion_name
+						participant_dict['id'] = participant['participantId']
+						participant_dict['highestAchievedSeasonTier'] = participant['highestAchievedSeasonTier']
 
-				#Save personal summoner data and put info into return dict
-				if len(summonerIdsArray) > 0:
-					matchup_dict = getBasicSummonerData(summonerIdsArray, matchup_dict, region)
+						#Add participant dict to return dict
+						if participant['participantId'] < 6:
+							matchup_dict['opponent'].append(participant_dict)
+						else:
+							matchup_dict['challenger'].append(participant_dict)
 
-				#rtn_dict['response'] = matchData
-				rtn_dict['matchup'] = matchup_dict
+					#Save personal summoner data and put info into return dict
+					if len(summonerIdsArray) > 0:
+						matchup_dict = getBasicSummonerData(summonerIdsArray, matchup_dict, region)
+
+					#rtn_dict['response'] = matchData
+					rtn_dict['matchup'] = matchup_dict
+				else:
+					rtn_dict['msg'] = matchHistory
 	except Exception as e :
 		print 'Unable to grab user data: {0}'.format(e)
 		logger.info('Unable to grab user data: {0}'.format(e))

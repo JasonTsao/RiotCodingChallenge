@@ -273,12 +273,10 @@
         champion_name_container.append(champion_name);
 
         stats = player_data['stats']
+        champion_stats = player_data['champion_stats']
 
-        //player_data['kda'] = '27.0/10.4/3.1';
-        stats['wins_as_champion'] = 102;
-        
-        wins_as_champion.html('Wins ' + stats['wins_as_champion']);
-        kda.html('KDA ' + stats['kda']);
+        wins_as_champion.html('Wins ' + champion_stats['wins']);
+        kda.html('KDA ' + champion_stats['kda']);
         
         masteries_title.html('Masteries');
         masteries_text.html(player_data['masteries']);
