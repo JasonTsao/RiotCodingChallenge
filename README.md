@@ -18,3 +18,5 @@ python manage.py collectstatic
 Improvements:
 	- break up data for getting summoner data into separate api calls for better user experience
 	- cache layer to speed up calls and reduce Riot API calls
+	- fix overflow issue when there's too many runes to display
+	- write a scheduler to update data that can go stale if constantly being pulled from cache

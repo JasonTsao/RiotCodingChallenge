@@ -8,7 +8,7 @@ RIOT_API_URL = 'https://na.api.pvp.net'
 
 from accounts.models import Account
 from champions.models import Champion, Spell, GeneralSpell
-from summoners.models import Summoner
+from summoners.models import Summoner, SummonerSummaryStats
 from static_data.models import Mastery, Rune
 
 logger = logging.getLogger("django.request")
@@ -41,6 +41,12 @@ def retrieveBasicStatsBySummonerId(region, summonerIds):
 def retrieveStatsBySummonerId(region, summonerIds):
 	get_summoner_stats_url = '{0}/api/lol/{1}/v1.3/stats/by-summoner/{2}/summary?api_key={3}'.format(RIOT_API_URL, region, summonerIds, api_key)
 	response = retrieveAPIData(get_summoner_stats_url)
+	return response
+
+
+def retrieveRankedStatsBySummonerId(region, summonerId):
+	get_ranked_summoner_data_url = '{0}/api/lol/{1}/v1.3/stats/by-summoner/{2}/ranked?api_key={3}'.format(RIOT_API_URL, region, summonerId, api_key)
+	response = retrieveAPIData(get_ranked_summoner_data_url)
 	return response
 
 
@@ -136,7 +142,7 @@ def getBasicSummonerData(summonerIdsArray, matchup_dict, region):
 		for participant in matchup_dict['challenger']:
 			if str(participant['player']['summonerId']) == str(k):
 				participant['summonerLevel'] = v['summonerLevel']
-				summoner = Summoner(name=v['name'], summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], 
+				summoner = Summoner(name=v['name'].lower(), summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], 
 									revisionDate=v['revisionDate'], highestAchievedSeasonTier=participant['highestAchievedSeasonTier'])
 				summoner.save()
 				break
@@ -145,7 +151,7 @@ def getBasicSummonerData(summonerIdsArray, matchup_dict, region):
 			for participant in matchup_dict['opponent']:
 				if str(participant['player']['summonerId']) == str(k):
 					participant['summonerLevel'] = v['summonerLevel']
-					summoner = Summoner(name=v['name'], summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], 
+					summoner = Summoner(name=v['name'].lower(), summonerId=v['id'], summonerLevel=v['summonerLevel'], profileIconId=v['profileIconId'], 
 										revisionDate=v['revisionDate'], highestAchievedSeasonTier=participant['highestAchievedSeasonTier'])
 					summoner.save()
 					break
@@ -231,3 +237,43 @@ def getSummonerRunes(runes_list, region):
 				runes[rune_obj.effect_type] = rune_obj.addition * rune['rank']
 
  	return runes
+
+
+def getSummonerNormalWins(summonerId, region):
+ 	wins = 0
+
+ 	try:
+	 	summoner_games = SummonerSummaryStats.objects.filter(summoner_id=summonerId)
+	 	if len(summoner_games) > 0:
+		 	for game in summoner_games:
+		 		wins += game.wins
+
+		else:
+	 		response = retrieveStatsBySummonerId(region, summonerId)
+		 	for summary in response['playerStatSummaries']:
+		 		wins += summary.get('wins', 0)
+
+		 		try:
+			 		summoner_summary = SummonerSummaryStats(summoner_id=summonerId,
+			 												wins=summary.get('wins', None),
+			 												losses=summary.get('losses', None), 
+			 												playerStatSummaryType=summary.get('playerStatSummaryType', None))
+			 		if summary['aggregatedStats']:
+			 			aggregated_stats = summary['aggregatedStats']
+			 			summoner_summary.totalChampionKills = aggregated_stats.get('totalChampionKills', None)
+			 			summoner_summary.totalTurretsKilled = aggregated_stats.get('totalTurretsKilled', None)
+			 			summoner_summary.totalMinionKills = aggregated_stats.get('totalMinionKills', None)
+			 			summoner_summary.totalNeutralMinionsKilled = aggregated_stats.get('totalNeutralMinionsKilled', None)
+			 			summoner_summary.totalAssists = aggregated_stats.get('totalAssists', None)
+
+			 		summoner_summary.save()
+			 	except Exception as e:
+			 		print 'Unable to save new summoner summary: {0}'.format(e)
+
+ 	except Exception as e:
+ 		print 'Error retreiving summoner: {0}'.format(e)
+
+ 	return wins
+
+def getSummonerRankedWins(summonerId, region):
+ 	pass

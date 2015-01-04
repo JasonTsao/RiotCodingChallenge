@@ -113,6 +113,34 @@ def getStatsBySummonerId(request, summonerIds):
 	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
 
 
+def getRankedStatsBySummonerId(request, summonerIds):
+	'''
+		API call for getting a summoners ranked stats by summoner ID from Riot API
+
+		Input:
+			summonerIds: summoner IDs to use to query 
+
+		Output:
+			json dict with ranked summoner stats
+	'''
+	rtn_dict = {"success": False, "msg": ""}
+
+	region = request.GET.get('region', 'na')
+
+	if region and summonerIds:
+		response = retrieveRankedStatsBySummonerId(region, summonerIds)
+
+		if type(response) is dict:
+			rtn_dict['response'] = response
+		else:
+			rtn_dict['msg'] = response
+			rtn_dict['response'] = {}
+	else:
+		rtn_dict['msg'] = 'Malformed request url'
+
+	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
+
+
 '''
 	RECENT GAMES BY SUMMONER ID API CALLS
 '''
@@ -206,6 +234,7 @@ def getUserMatchData(request):
 					participant_dict['spell2'] = getSummonerSpell(participant['spell2Id'], region)
 					participant_dict['masteries'] = getSummonerMasteries(participant['masteries'],region)
 					participant_dict['runes'] = getSummonerRunes(participant['runes'],region)
+					participant_dict['wins'] = getSummonerNormalWins(participant_dict['player']['summonerId'],region)
 
 					participant_dict['champion_name'] = champion_name
 					participant_dict['id'] = participant['participantId']

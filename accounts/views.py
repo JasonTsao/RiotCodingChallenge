@@ -11,7 +11,7 @@ from django.http import HttpResponse
 
 from riot.utils import retrieveSummonerbyName
 from models import Account
-
+from summoners.models import Summoner 
 
 def login_func(request):
 	rtn_dict = {"success": False, "msg": "", 'next':''}
@@ -49,6 +49,15 @@ def login_func(request):
 					rtn_dict['success'] = True
 				else:
 					print 'user is none!'
+
+				'''
+				FOR LATER : CREATE SUMMONER ON LOGIN
+				try:
+					summoner = Summoner(summonerId=response[username]['id'], summonerLevel=response[username]['summonerLevel'], name=username, profileIconId=response[username]['profileIconId'])
+					summoner.save()
+				except Exception as e:
+					print 'Failed attempting to create summoner: {0}'.format(e)
+				'''
 			except Exception as e:
 				print 'Unable to get login: {0}'.format(e)
 		else:
