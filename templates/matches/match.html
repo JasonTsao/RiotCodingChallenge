@@ -48,6 +48,8 @@
 
 {% block endScripts%}
 <script>
+    var bottom_div_loaded = false;
+
     $(document).ready(function() {
         $('.swiper-container').each(function(){
             $(this).height($(this).width());
@@ -137,8 +139,10 @@
                 console.log('failed to remove slide for swiper: ' + swiper_id + ' : ' + url);
             }
             else{
+                if(!bottom_div_loaded){
+                    $('#opponent-matchup-container').addClass('hidden-container');
+                }
                 //$('#opponent-matchup-container').addClass('hidden-container');
-                console.log('bad image at index: ' + image_index + ' : ' + url);
                 //swiper.removeSlide(image_index);
             }
         }
@@ -383,6 +387,7 @@
             updateOnImagesReady:true,
             onImagesReady: function(){
                 $('#opponent-matchup-container').addClass('hidden-container');
+                bottom_div_loaded = true;
             }
         });
         /* SET OPPONENT SWIPER*/
