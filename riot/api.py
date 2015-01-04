@@ -229,12 +229,16 @@ def getUserMatchData(request):
 						summonerIdsArray.append(str(participant_dict['player']['summonerId']))
 
 
+					players_stats = {'wins':0, 'ranked_wins':0, 'wins_with_champion':0, 'kda':''}
 					#Add Summoner Spells and Masteries to return dict
 					participant_dict['spell1'] = getSummonerSpell(participant['spell1Id'], region)
 					participant_dict['spell2'] = getSummonerSpell(participant['spell2Id'], region)
 					participant_dict['masteries'] = getSummonerMasteries(participant['masteries'],region)
 					participant_dict['runes'] = getSummonerRunes(participant['runes'],region)
-					participant_dict['wins'] = getSummonerNormalWins(participant_dict['player']['summonerId'],region)
+					participant_dict['stats'] = getSummonerNormalWins(participant_dict['player']['summonerId'],region)
+					#participant_dict['wins'] = getSummonerNormalWins(participant_dict['player']['summonerId'],region)
+					#participant_dict['wins'] = 9000
+					#participant_dict['ranked_wins'] = getSummonerRankedWins(participant_dict['player']['summonerId'],region, participant['championId'])
 
 					participant_dict['champion_name'] = champion_name
 					participant_dict['id'] = participant['participantId']

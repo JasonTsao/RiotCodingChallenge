@@ -24,8 +24,21 @@ class SummonerSummaryStats(models.Model):
     wins = models.IntegerField(blank=True, null=True)
     losses = models.IntegerField(blank=True, null=True)
     totalChampionKills = models.IntegerField(blank=True, null=True)
+    totalDeathsPerSession = models.IntegerField(blank=True, null=True)
+    totalAssists = models.IntegerField(blank=True, null=True)
     totalTurretsKilled = models.IntegerField(blank=True, null=True)
     totalMinionKills = models.IntegerField(blank=True, null=True)
     totalNeutralMinionsKilled = models.IntegerField(blank=True, null=True)
-    totalAssists = models.IntegerField(blank=True, null=True)
+
+    averageChampionsKilled = models.FloatField(blank=True, null=True) 
+    averageNumDeaths = models.FloatField(blank=True, null=True) 
+    averageAssists = models.FloatField(blank=True, null=True)
     ranked = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        ranked = ''
+        if self.ranked:
+            ranked = 'Ranked'
+        else:
+            ranked = 'Unranked'
+        return '{0} : {1} : {2}'.format(self.summoner_id, self.playerStatSummaryType, ranked)

@@ -13,6 +13,7 @@ from static_data.models import Mastery, Rune
 
 logger = logging.getLogger("django.request")
 
+
 def retrieveAPIData(api_url):
 	response = {}
 	try:
@@ -243,14 +244,66 @@ def getSummonerRunes(runes_list, region):
 
 
 def getSummonerNormalWins(summonerId, region):
- 	wins = 0
-
+ 	#wins = 0
+ 	
+ 	player_stats = {'wins':0, 'ranked_wins':0, 'wins_with_champion':0, 'kills':0.0, 'deaths':0.0, 'assists':0.0, 'kda':'n/a'}
  	try:
- 		#response = retrieveStatsBySummonerId(region, summonerId)
-		#for summary in response['playerStatSummaries']:
-		#	wins += summary.get('wins', 0)
-
 	 	summoner_games = SummonerSummaryStats.objects.filter(summoner_id=summonerId)
+
+	 	if not summoner_games:
+	 		summoner_games = []
+	 		response = retrieveStatsBySummonerId(region, summonerId)
+
+	 		if type(response) is dict:
+			 	for summary in response['playerStatSummaries']:
+			 		#wins += summary.get('wins', 0)
+			 		try:
+				 		summoner_summary = SummonerSummaryStats(summoner_id=summonerId,
+				 												wins=summary.get('wins', None),
+				 												losses=summary.get('losses', None), 
+				 												playerStatSummaryType=summary.get('playerStatSummaryType', None))
+				 		if summary['aggregatedStats']:
+				 			aggregated_stats = summary['aggregatedStats']
+				 			summoner_summary.totalChampionKills = aggregated_stats.get('totalChampionKills', None)
+				 			summoner_summary.totalTurretsKilled = aggregated_stats.get('totalTurretsKilled', None)
+				 			summoner_summary.totalMinionKills = aggregated_stats.get('totalMinionKills', None)
+				 			summoner_summary.totalNeutralMinionsKilled = aggregated_stats.get('totalNeutralMinionsKilled', None)
+				 			summoner_summary.totalAssists = aggregated_stats.get('totalAssists', None)
+				 			
+				 			summoner_summary.averageChampionsKilled = aggregated_stats.get('averageChampionsKilled', None)
+				 			summoner_summary.averageNumDeaths = aggregated_stats.get('averageNumDeaths', None)
+				 			summoner_summary.averageAssists = aggregated_stats.get('averageAssists', None)
+				 			
+
+				 		if summary['playerStatSummaryType'][:6] == 'Ranked':
+				 			summoner_summary.ranked = True
+
+				 		summoner_summary.save()
+				 		summoner_games.append(summoner_summary)
+				 	except Exception as e:
+				 		print 'Unable to save new summoner summary: {0}'.format(e)
+
+		num_games = len(summoner_games)
+
+
+
+		for game in summoner_games:
+			player_stats['wins'] += game.wins
+
+			if game.ranked:
+				player_stats['ranked_wins'] += game.wins
+
+			player_stats['kills'] += game.totalChampionKills if game.totalChampionKills else 0
+			player_stats['deaths'] += game.totalDeathsPerSession if game.totalDeathsPerSession else 0
+			player_stats['assists'] += game.totalAssists if game.totalAssists else 0
+
+		#if player_stats['kills'] and player_stats['deaths'] and player_stats['assists']:
+		if player_stats['kills'] and player_stats['assists']:
+			kda = ["%.2f" % (player_stats['kills']/num_games), "%.2f" % (player_stats['deaths']/num_games), "%.2f" % (player_stats['assists']/num_games)]
+			player_stats['kda'] = '/'.join(kda)
+
+
+	 	'''
 	 	if len(summoner_games) > 0:
 		 	for game in summoner_games:
 		 		wins += game.wins
@@ -273,18 +326,44 @@ def getSummonerNormalWins(summonerId, region):
 				 			summoner_summary.totalMinionKills = aggregated_stats.get('totalMinionKills', None)
 				 			summoner_summary.totalNeutralMinionsKilled = aggregated_stats.get('totalNeutralMinionsKilled', None)
 				 			summoner_summary.totalAssists = aggregated_stats.get('totalAssists', None)
+				 			
+				 			summoner_summary.averageChampionsKilled = aggregated_stats.get('averageChampionsKilled', None)
+				 			summoner_summary.averageNumDeaths = aggregated_stats.get('averageNumDeaths', None)
+				 			summoner_summary.averageAssists = aggregated_stats.get('averageAssists', None)
+				 			
+
+				 		if summary['playerStatSummaryType'][:6] == 'Ranked':
+				 			summoner_summary.ranked = True
 
 				 		summoner_summary.save()
 				 	except Exception as e:
 				 		print 'Unable to save new summoner summary: {0}'.format(e)
 			else:
 				print response
+			'''
 
 
  	except Exception as e:
- 		print 'Error retreiving summoner: {0}'.format(e)
+ 		print 'Error retreiving summoner normal stats: {0}'.format(e)
+
+ 	#return wins
+ 	return player_stats
+
+def getSummonerRankedWins(summonerId, region, championId):
+ 	wins = 0
+
+ 	try:
+	 	summoner_games = SummonerSummaryStats.objects.filter(summoner_id=summonerId, ranked=True)
+	 	if len(summoner_games) > 0:
+		 	for game in summoner_games:
+		 		wins += game.wins
+
+		else:
+			response = retrieveRankedStatsBySummonerId(region, summonerId)
+	 		if type(response) is dict:
+	 			pass	
+	except Exception as e:
+ 		print 'Error retreiving summoner normal stats: {0}'.format(e)
+
 
  	return wins
-
-def getSummonerRankedWins(summonerId, region):
- 	pass
