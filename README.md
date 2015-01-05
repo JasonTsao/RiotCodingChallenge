@@ -6,6 +6,8 @@ sudo pip install virtualenv
 
 sudo apt-get install gunicorn
 
+sudo apt-get install redis-server
+
 sudo apt-get install nginx
 sudo nano /etc/nginx/sites-enabled/default
 

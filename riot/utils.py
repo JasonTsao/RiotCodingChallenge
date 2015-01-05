@@ -1,4 +1,5 @@
 from RiotCodingChallenge.settings import RIOT_KEY as api_key
+from rediscli import r as R
 import json
 import urllib
 import urllib2
@@ -13,9 +14,22 @@ from static_data.models import Mastery, Rune
 
 logger = logging.getLogger("django.request")
 
+
 '''
 	UTILITY FUNCTIONS FOR THINGS THAT WILL HAPPEN A LOT
 '''
+
+
+def pushToNOSQLHash(key, push_item):
+	r = R.r
+	r.hmset(key, push_item)
+
+
+def pushToNOSQLSet(key, push_item, delete_item, score):
+	r = R.r
+	r.zadd(key, push_item, score)
+	if delete_item:
+		r.zrem(key, delete_item)
 
 
 def retrieveAPIData(api_url):
@@ -234,66 +248,73 @@ def getSummonerMasteries(masteries_list, region):
 	return masteries
 
 
-def getSummonerRunes(runes_list, region):
+def getSummonerRunes(runes_list, matchId, summonerId, region):
 	runes = {}
 	is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble = False
 	secondary_addition = 0
 	secondary_effect_type = ''
 
-	for rune in runes_list:
-		try:
-			rune_obj = Rune.objects.get(rune_id=rune['runeId'])
+	r = R.r
+	r_summoner_runes_key = 'match.{0}.summoner.{1}.runes.hash'.format(matchId, summonerId)
+	runes = r.hgetall(r_summoner_runes_key)
+
+	if not runes:
+		for rune in runes_list:
 			try:
-				runes[rune_obj.effect_type] += rune_obj.addition * rune['rank']
-			except:
-				runes[rune_obj.effect_type] = rune_obj.addition * rune['rank']
-
-			if rune_obj.name == 'Greater Mark of Hybrid Penetration':
+				rune_obj = Rune.objects.get(rune_id=rune['runeId'])
 				try:
-					runes[rune_obj.secondary_effect_type] += rune_obj.secondary_addition * rune['rank']
+					runes[rune_obj.effect_type] += rune_obj.addition * rune['rank']
 				except:
-					runes[rune_obj.secondary_effect_type] = rune_obj.secondary_addition * rune['rank']
-		except:
-			response = retrieveRuneDataById(region, rune['runeId'])
+					runes[rune_obj.effect_type] = rune_obj.addition * rune['rank']
 
-			desc_array = response['description'].split(' ')
+				if rune_obj.name == 'Greater Mark of Hybrid Penetration':
+					try:
+						runes[rune_obj.secondary_effect_type] += rune_obj.secondary_addition * rune['rank']
+					except:
+						runes[rune_obj.secondary_effect_type] = rune_obj.secondary_addition * rune['rank']
+			except:
+				response = retrieveRuneDataById(region, rune['runeId'])
 
-			if desc_array[0].endswith('%'):
-				addition = desc_array[0][1:-1]
-				effect_type = ' '.join(desc_array[1:])
-			elif response['name'] == 'Greater Mark of Hybrid Penetration':
-				desc_split_array = response['description'].split('/')
-				desc_split_array[0] = desc_split_array[0].strip()
-				desc_split_array[1] = desc_split_array[1].strip()
+				desc_array = response['description'].split(' ')
 
-				first_array = desc_split_array[0].split(' ')
-				second_array = desc_split_array[1].split(' ')
+				if desc_array[0].endswith('%'):
+					addition = desc_array[0][1:-1]
+					effect_type = ' '.join(desc_array[1:])
+				elif response['name'] == 'Greater Mark of Hybrid Penetration':
+					desc_split_array = response['description'].split('/')
+					desc_split_array[0] = desc_split_array[0].strip()
+					desc_split_array[1] = desc_split_array[1].strip()
 
-				addition = first_array[0][1:]
-				effect_type = ' '.join(first_array[1:])
+					first_array = desc_split_array[0].split(' ')
+					second_array = desc_split_array[1].split(' ')
 
-				secondary_addition = second_array[0][1:]
-				secondary_effect_type = ' '.join(second_array[1:])
+					addition = first_array[0][1:]
+					effect_type = ' '.join(first_array[1:])
 
-				is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble = True
+					secondary_addition = second_array[0][1:]
+					secondary_effect_type = ' '.join(second_array[1:])
 
-			else:
-				addition = desc_array[0][1:]
-				effect_type = ' '.join(desc_array[1:])
+					is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble = True
 
-			rune_obj = Rune(rune_id=rune['runeId'], name=response['name'], addition=addition, effect_type=effect_type, rune_type=response['rune']['type'], tier=response['rune']['tier'])
-			
-			if is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble:
-				rune_obj.secondary_addition = secondary_addition
-				rune_obj.secondary_effect_type = secondary_effect_type
+				else:
+					addition = desc_array[0][1:]
+					effect_type = ' '.join(desc_array[1:])
 
-			rune_obj.save()
+				rune_obj = Rune(rune_id=rune['runeId'], name=response['name'], addition=addition, effect_type=effect_type, rune_type=response['rune']['type'], tier=response['rune']['tier'])
+				
+				if is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble:
+					rune_obj.secondary_addition = secondary_addition
+					rune_obj.secondary_effect_type = secondary_effect_type
 
-			if is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble:
-				runes[rune_obj.effect_type] = rune_obj.addition * rune['rank']
-				runes[rune_obj.secondary_effect_type] = rune_obj.secondary_effect_type * rune['rank']
-			else:
-				runes[rune_obj.effect_type] = rune_obj.addition * rune['rank']
+				rune_obj.save()
+
+				if is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble:
+					runes[rune_obj.effect_type] = rune_obj.addition * rune['rank']
+					runes[rune_obj.secondary_effect_type] = rune_obj.secondary_effect_type * rune['rank']
+				else:
+					runes[rune_obj.effect_type] = rune_obj.addition * rune['rank']
+
+		pushToNOSQLHash(r_summoner_runes_key, runes)
 
  	return runes
 
