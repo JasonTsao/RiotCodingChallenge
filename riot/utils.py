@@ -359,59 +359,58 @@ def getSummonerRunes(runes_list, matchId, summonerId, region):
 
 
 def getSummonerNormalWins(summonerId, region):
- 	#player_stats = {'wins':0, 'ranked_wins':0, 'wins_with_champion':0, 'kills':0.0, 'deaths':0.0, 'assists':0.0, 'kda':'n/a'}
+ 	player_stats = {'wins':0, 'ranked_wins':0, 'wins_with_champion':0, 'kills':0.0, 'deaths':0.0, 'assists':0.0, 'kda':'n/a'}
  	r = R.r
 	r_summoner_stats_key = 'summoner.{0}.stats.hash'.format(summonerId)
-	player_stats = r.hgetall(r_summoner_stats_key)
+	
+	try:
+		summoner_games = SummonerSummaryStats.objects.filter(summoner_id=summonerId)
 
-	if not player_stats:
-		player_stats = {'wins':0, 'ranked_wins':0, 'wins_with_champion':0, 'kills':0.0, 'deaths':0.0, 'assists':0.0, 'kda':'n/a'}
-	 	try:
-		 	summoner_games = SummonerSummaryStats.objects.filter(summoner_id=summonerId)
+		if not summoner_games:
+		 	summoner_games = []
+		 	response = retrieveStatsBySummonerId(region, summonerId)
 
-		 	if not summoner_games:
-		 		summoner_games = []
-		 		response = retrieveStatsBySummonerId(region, summonerId)
-
-		 		if type(response) is dict:
-				 	for summary in response['playerStatSummaries']:
-				 		try:
-					 		summoner_summary = SummonerSummaryStats(summoner_id=summonerId,
-					 												wins=summary.get('wins', None),
-					 												losses=summary.get('losses', None), 
-					 												playerStatSummaryType=summary.get('playerStatSummaryType', None))
-					 		if summary['aggregatedStats']:
-					 			aggregated_stats = summary['aggregatedStats']
-					 			summoner_summary.totalChampionKills = aggregated_stats.get('totalChampionKills', None)
-					 			summoner_summary.totalTurretsKilled = aggregated_stats.get('totalTurretsKilled', None)
-					 			summoner_summary.totalMinionKills = aggregated_stats.get('totalMinionKills', None)
-					 			summoner_summary.totalNeutralMinionsKilled = aggregated_stats.get('totalNeutralMinionsKilled', None)
-					 			summoner_summary.totalAssists = aggregated_stats.get('totalAssists', None)
+		 	if type(response) is dict:
+				 for summary in response['playerStatSummaries']:
+				 	try:
+					 	summoner_summary = SummonerSummaryStats(summoner_id=summonerId,
+					 											wins=summary.get('wins', None),
+					 											losses=summary.get('losses', None), 
+					 											playerStatSummaryType=summary.get('playerStatSummaryType', None))
+					 	if summary['aggregatedStats']:
+					 		aggregated_stats = summary['aggregatedStats']
+					 		summoner_summary.totalChampionKills = aggregated_stats.get('totalChampionKills', None)
+					 		summoner_summary.totalTurretsKilled = aggregated_stats.get('totalTurretsKilled', None)
+					 		summoner_summary.totalMinionKills = aggregated_stats.get('totalMinionKills', None)
+					 		summoner_summary.totalNeutralMinionsKilled = aggregated_stats.get('totalNeutralMinionsKilled', None)
+					 		summoner_summary.totalAssists = aggregated_stats.get('totalAssists', None)
 					 			
-					 			summoner_summary.averageChampionsKilled = aggregated_stats.get('averageChampionsKilled', None)
-					 			summoner_summary.averageNumDeaths = aggregated_stats.get('averageNumDeaths', None)
-					 			summoner_summary.averageAssists = aggregated_stats.get('averageAssists', None)
+					 		summoner_summary.averageChampionsKilled = aggregated_stats.get('averageChampionsKilled', None)
+					 		summoner_summary.averageNumDeaths = aggregated_stats.get('averageNumDeaths', None)
+					 		summoner_summary.averageAssists = aggregated_stats.get('averageAssists', None)
 					 			
 
-					 		if summary['playerStatSummaryType'][:6] == 'Ranked':
-					 			summoner_summary.ranked = True
+					 	if summary['playerStatSummaryType'][:6] == 'Ranked':
+					 		summoner_summary.ranked = True
 
-					 		summoner_summary.save()
-					 		summoner_games.append(summoner_summary)
-					 	except Exception as e:
-					 		print 'Unable to save new summoner summary: {0}'.format(e)
+					 	summoner_summary.save()
+					 	summoner_games.append(summoner_summary)
+					except Exception as e:
+					 	print 'Unable to save new summoner summary: {0}'.format(e)
 
-			num_games = len(summoner_games)
-			for game in summoner_games:
-				player_stats['wins'] += game.wins
+		else:
+			player_stats = r.hgetall(r_summoner_stats_key)
+			if not player_stats:
+				player_stats = {'wins':0, 'ranked_wins':0, 'wins_with_champion':0, 'kills':0.0, 'deaths':0.0, 'assists':0.0, 'kda':'n/a'}
+				num_games = len(summoner_games)
+				for game in summoner_games:
+					player_stats['wins'] += game.wins
+					if game.ranked:
+						player_stats['ranked_wins'] += game.wins
+				pushToNOSQLHash(r_summoner_stats_key, player_stats)
 
-				if game.ranked:
-					player_stats['ranked_wins'] += game.wins
-
-			pushToNOSQLHash(r_summoner_stats_key, player_stats)
-
-	 	except Exception as e:
-	 		print 'Error retreiving summoner normal stats: {0}'.format(e)
+	except Exception as e:
+		print 'Error retreiving summoner normal stats: {0}'.format(e)
 
  	return player_stats
 
