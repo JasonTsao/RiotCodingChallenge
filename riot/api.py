@@ -240,7 +240,7 @@ def getUserMatchData(request):
 						#Add Summoner Spells and Masteries to return dict
 						participant_dict['spell1'] = getSummonerSpell(participant['spell1Id'], region)
 						participant_dict['spell2'] = getSummonerSpell(participant['spell2Id'], region)
-						participant_dict['masteries'] = getSummonerMasteries(participant['masteries'],region)
+						participant_dict['masteries'] = getSummonerMasteries(participant['masteries'], matchId, participant_dict['player']['summonerId'], region)
 						participant_dict['runes'] = getSummonerRunes(participant['runes'],matchId, participant_dict['player']['summonerId'],region)
 						participant_dict['stats'] = getSummonerNormalWins(participant_dict['player']['summonerId'],region)
 
