@@ -17,17 +17,18 @@ from static_data.models import Mastery, Rune
 logger = logging.getLogger("django.request")
 
 
-'''
-	UTILITY FUNCTIONS FOR THINGS THAT WILL HAPPEN A LOT
-'''
-
-
 def pushToNOSQLHash(key, push_item):
+	'''
+		Store dictionary style data to redis to be used as cache layer
+	'''
 	r = R.r
 	r.hmset(key, push_item)
 
 
 def retrieveAPIData(api_url):
+	'''
+		Base function for making calls to Riot API
+	'''
 	response = {}
 	try:
 		conn = urllib2.urlopen(api_url)
@@ -39,6 +40,11 @@ def retrieveAPIData(api_url):
 		print 'Error when requesting from Riot API: {0}'.format(error)
 		response = 'Error when requesting from Riot API: {0}'.format(error)
 	return response
+
+
+'''
+	DIRECT CALLS TO RIOT API
+'''
 
 
 def retrieveSummonerbyName(region, summonerNames):
@@ -105,7 +111,15 @@ def retrieveRuneDataById(region, runeId):
 	return response
 
 
+'''
+	HELPER FUNCTIONS FOR FORMING MATCH DATA, HANDLES HEAVY LIFTING OF SYSTEM API CALLS
+'''
+
+
 def getAndStoreMasteries(region):
+	'''
+		Store every mastery that can be pulled from Riot API
+	'''
 	get_masteries_url = '{0}/api/lol/static-data/{1}/v1.2/mastery?masteryListData=ranks,tree&api_key={2}'.format(RIOT_API_URL, region, api_key)
 	response = retrieveAPIData(get_masteries_url)
 
@@ -122,6 +136,9 @@ def getAndStoreMasteries(region):
 
 
 def getAndStoreRunes(region):
+	'''
+		Store every rune that can be pulled from Riot API
+	'''
 	is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble = False
 	secondary_addition = 0
 	secondary_effect_type = ''
@@ -133,14 +150,18 @@ def getAndStoreRunes(region):
 
 	if type(response) is dict:
 		for rune_id, rune_data in response['data'].items():
+			#break rune up into it's value and it's name
 			desc_array = rune_data['description'].split(' ')
 
 			r_rune_key = 'rune.{0}.hash'.format(rune_id)
 
+			#handle cases where a rune give you a % boost
 			if desc_array[0].endswith('%'):
 				addition = desc_array[0][1:-1]
 				effect_type = ' '.join(desc_array[1:])
+			#deal with the stupid greater mark of hybrid penetration case
 			elif rune_data['name'] == 'Greater Mark of Hybrid Penetration':
+				#split rune into two parts which then turns into the same problem as before
 				desc_split_array = rune_data['description'].split('/')
 				desc_split_array[0] = desc_split_array[0].strip()
 				desc_split_array[1] = desc_split_array[1].strip()
@@ -157,9 +178,11 @@ def getAndStoreRunes(region):
 				is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble = True
 
 			else:
+				#parse out name and value
 				addition = desc_array[0][1:]
 				effect_type = ' '.join(desc_array[1:])
 
+			#save run object to DB
 			try:
 				rune_obj = Rune.objects.get(rune_id=rune_id)
 			except Exception as e:
@@ -171,6 +194,7 @@ def getAndStoreRunes(region):
 
 				rune_obj.save()
 
+			#cache rune objs to redis layer so we can hit our db less
 			pushToNOSQLHash(r_rune_key, model_to_dict(rune_obj))
 	return response
 
@@ -195,6 +219,7 @@ def getChampionName(championId, region):
 		r.set(r_champion_name_key, champion_name)
 
 	return champion_name
+
 
 def getSummonerSpell(spellId, region):
 	spell_key = ''
@@ -229,6 +254,7 @@ def getBasicSummonerData(summonerIdsArray, matchup_dict, region):
 	#I realize running this forloop to fill it up isn't the most efficient way but since it'll always be only 
 	#10 players I figure this time should be short
 
+	#save summoner level since this is the only time we'll usually see it
 	if type(basicSummonerStats) is dict:
 		for k, v in basicSummonerStats.items():
 			summoner = False
@@ -254,6 +280,9 @@ def getBasicSummonerData(summonerIdsArray, matchup_dict, region):
 
 
 def getSummonerMasteries(masteries_list, matchId, summonerId,region):
+	'''
+		get a formatted masteries string : offense/defenese/utility
+	'''
 
 	masteries = ''
 	masteries_dict = {'Offense':0, 'Defense': 0, 'Utility':0}
@@ -359,6 +388,14 @@ def getSummonerRunes(runes_list, matchId, summonerId, region):
 
 
 def getSummonerNormalWins(summonerId, region):
+	'''
+		Get information about this summoners previous matches
+			wins
+			ranked_wins
+			kills
+			deaths
+			assists
+	'''
  	player_stats = {'wins':0, 'ranked_wins':0, 'wins_with_champion':0, 'kills':0.0, 'deaths':0.0, 'assists':0.0, 'kda':'n/a'}
  	r = R.r
 	r_summoner_stats_key = 'summoner.{0}.stats.hash'.format(summonerId)
@@ -414,7 +451,11 @@ def getSummonerNormalWins(summonerId, region):
 
  	return player_stats
 
+
 def getSummonerChampionStats(summonerId, region, championId):
+	'''
+		Get information for a summoner for a specific championg (in ranked games only)
+	'''
 	r = R.r
 	r_summoner_champion_stats_key = 'summoner.{0}.champion.{1}.stats.hash'.format(summonerId, championId)
 	ranked_player_stats = r.hgetall(r_summoner_champion_stats_key)

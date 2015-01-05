@@ -142,11 +142,6 @@ def getRankedStatsBySummonerId(request, summonerIds):
 
 
 '''
-	RECENT GAMES BY SUMMONER ID API CALLS
-'''
-
-
-'''
 	MATCH DATA API CALLS
 '''
 
@@ -270,11 +265,22 @@ def getUserMatchData(request):
 
 	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
 
+
 '''
 	STATIC DATA (champion, items, languages, masteries, realms, runes, summoner-spells)
 '''
 
+
 def getChampionDataById(request, championId):
+	'''
+		API call for getting a champion data by champion id from Riot API
+
+		Input:
+			championId: integer champion id
+
+		Output:
+			formatted json dict to be dumped to frontend for displaying champion data
+	'''
 	rtn_dict = {"success": False, "msg": ""}
 
 	region = request.GET.get('region', 'na')
@@ -290,6 +296,15 @@ def getChampionDataById(request, championId):
 
 
 def getAndStoreAllMasteries(request):
+	'''
+		API call on server setup to fill in DB with static masteries and cache them for quick access
+
+		Input:
+			request: HTTP Request object
+
+		Output:
+			formatted json dict to be dumped to frontend for displaying rune data
+	'''
 	rtn_dict = {"success": False, "msg": ""}
 
 	region = request.GET.get('region', 'na')
@@ -303,6 +318,15 @@ def getAndStoreAllMasteries(request):
 
 
 def getAndStoreAllRunes(request):
+	'''
+		API call on server setup to fill in DB with static runes and cache them for quick access
+
+		Input:
+			request: HTTP Request object
+
+		Output:
+			formatted json dict to be dumped to frontend for displaying rune data
+	'''
 	rtn_dict = {"success": False, "msg": ""}
 
 	region = request.GET.get('region', 'na')
