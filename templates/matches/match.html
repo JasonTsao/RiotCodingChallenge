@@ -60,19 +60,39 @@
     function toggleTeamView(mode){
         if (mode == 'challenger'){
 
-            $('#challenger-matchup-container').removeClass('hidden-container');
+            $('#opponent-matchup-container').fadeOut(function(){
+                $('#challenger-matchup-container').fadeIn(function(){
+                    $('#opponent-title').removeClass('team-title-selected');
+                    $('#challenger-title').addClass('team-title-selected');
+
+                });
+            });
+
+            
+
+            
+            /*$('#challenger-matchup-container').removeClass('hidden-container');
             $('#opponent-title').removeClass('team-title-selected');
 
             $('#opponent-matchup-container').addClass('hidden-container');
-            $('#challenger-title').addClass('team-title-selected');
+            $('#challenger-title').addClass('team-title-selected');*/
         }
         else if (mode == 'opponent'){
 
-            $('#opponent-matchup-container').removeClass('hidden-container');
+            $('#challenger-matchup-container').fadeOut(function(){
+                
+                $('#opponent-matchup-container').fadeIn(function(){
+                    $('#challenger-title').removeClass('team-title-selected');
+                    $('#opponent-title').addClass('team-title-selected');
+                });
+            });
+
+            
+            /*$('#opponent-matchup-container').removeClass('hidden-container');
             $('#challenger-title').removeClass('team-title-selected');
 
             $('#challenger-matchup-container').addClass('hidden-container');
-            $('#opponent-title').addClass('team-title-selected');
+            $('#opponent-title').addClass('team-title-selected');*/
         }
     }
 
