@@ -54,9 +54,11 @@
 }
 
 .champion-img-container{
-	z-index:-1;
+	/*z-index:-1;*/
 	clear:both;
 
+	background-color:rgba(0,0,0, 0.7);
+	border-radius:10px;
 	position:absolute;
 	width:100%;
 }
@@ -136,16 +138,16 @@
 	float:left;
 	width:50%;
 	padding:10px;
-	border-radius:10px;
-	background-color: rgba(0,0,0, 0.7);
+	/*border-radius:10px;
+	background-color: rgba(0,0,0, 0.7);*/
 }
 
 .right-side-div{
 	float:right;
 	width:50%;
 	padding:10px;
-	border-radius:10px;
-	background-color: rgba(0,0,0, 0.7);
+	/*border-radius:10px;
+	background-color: rgba(0,0,0, 0.7);*/
 
 	max-height:100%;
 	overflow:hidden;
