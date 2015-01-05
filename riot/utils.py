@@ -13,6 +13,10 @@ from static_data.models import Mastery, Rune
 
 logger = logging.getLogger("django.request")
 
+'''
+	UTILITY FUNCTIONS FOR THINGS THAT WILL HAPPEN A LOT
+'''
+
 
 def retrieveAPIData(api_url):
 	response = {}
@@ -101,6 +105,54 @@ def getAndStoreMasteries(region):
 			for item in data['masteryTreeItems']:
 				if item:
 					mastery = Mastery.objects.get_or_create(mastery_id=item['masteryId'], name=response['data'][str(item['masteryId'])]['name'], mastery_type=mastery_type, prereq=item['prereq'])
+	return response
+
+
+def getAndStoreRunes(region):
+	is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble = False
+	secondary_addition = 0
+	secondary_effect_type = ''
+
+	get_masteries_url = '{0}/api/lol/static-data/{1}/v1.2/rune?api_key={2}'.format(RIOT_API_URL, region, api_key)
+	response = retrieveAPIData(get_masteries_url)
+
+	if type(response) is dict:
+		for rune_id, rune_data in response['data'].items():
+			desc_array = rune_data['description'].split(' ')
+
+			if desc_array[0].endswith('%'):
+				addition = desc_array[0][1:-1]
+				effect_type = ' '.join(desc_array[1:])
+			elif rune_data['name'] == 'Greater Mark of Hybrid Penetration':
+				desc_split_array = rune_data['description'].split('/')
+				desc_split_array[0] = desc_split_array[0].strip()
+				desc_split_array[1] = desc_split_array[1].strip()
+
+				first_array = desc_split_array[0].split(' ')
+				second_array = desc_split_array[1].split(' ')
+
+				addition = first_array[0][1:]
+				effect_type = ' '.join(first_array[1:])
+
+				secondary_addition = second_array[0][1:]
+				secondary_effect_type = ' '.join(second_array[1:])
+
+				is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble = True
+
+			else:
+				addition = desc_array[0][1:]
+				effect_type = ' '.join(desc_array[1:])
+
+			try:
+				rune_obj = Rune.objects.get(rune_id=rune_id)
+			except Exception as e:
+				rune_obj = Rune(rune_id=rune_id, name=rune_data['name'], addition=addition, effect_type=effect_type, rune_type=rune_data['rune']['type'], tier=rune_data['rune']['tier'])
+				
+				if is_the_stupid_greater_mark_of_hybrid_penetration_thats_giving_me_trouble:
+					rune_obj.secondary_addition = secondary_addition
+					rune_obj.secondary_effect_type = secondary_effect_type
+
+				rune_obj.save()
 	return response
 
 
@@ -247,8 +299,6 @@ def getSummonerRunes(runes_list, region):
 
 
 def getSummonerNormalWins(summonerId, region):
- 	#wins = 0
- 	
  	player_stats = {'wins':0, 'ranked_wins':0, 'wins_with_champion':0, 'kills':0.0, 'deaths':0.0, 'assists':0.0, 'kda':'n/a'}
  	try:
 	 	summoner_games = SummonerSummaryStats.objects.filter(summoner_id=summonerId)
@@ -259,7 +309,6 @@ def getSummonerNormalWins(summonerId, region):
 
 	 		if type(response) is dict:
 			 	for summary in response['playerStatSummaries']:
-			 		#wins += summary.get('wins', 0)
 			 		try:
 				 		summoner_summary = SummonerSummaryStats(summoner_id=summonerId,
 				 												wins=summary.get('wins', None),
@@ -287,32 +336,15 @@ def getSummonerNormalWins(summonerId, region):
 				 		print 'Unable to save new summoner summary: {0}'.format(e)
 
 		num_games = len(summoner_games)
-
-
-
 		for game in summoner_games:
 			player_stats['wins'] += game.wins
 
 			if game.ranked:
 				player_stats['ranked_wins'] += game.wins
 
-			'''
-			player_stats['kills'] += game.totalChampionKills if game.totalChampionKills else 0
-			player_stats['deaths'] += game.totalDeathsPerSession if game.totalDeathsPerSession else 0
-			player_stats['assists'] += game.totalAssists if game.totalAssists else 0
-			'''
-
-		'''
-		#if player_stats['kills'] and player_stats['deaths'] and player_stats['assists']:
-		if player_stats['kills'] and player_stats['assists']:
-			kda = ["%.1f" % (player_stats['kills']/num_games), "%.1f" % (player_stats['deaths']/num_games), "%.1f" % (player_stats['assists']/num_games)]
-			player_stats['kda'] = '/'.join(kda)
-		'''
-
  	except Exception as e:
  		print 'Error retreiving summoner normal stats: {0}'.format(e)
 
- 	#return wins
  	return player_stats
 
 def getSummonerChampionStats(summonerId, region, championId):

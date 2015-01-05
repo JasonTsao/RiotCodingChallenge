@@ -10,4 +10,5 @@ urlpatterns = patterns("riot.api",
 			url(r"^match_data", "getUserMatchData"),
 			url(r"^champion/(\d+)", "getChampionDataById"),
 			url(r"^masteries/get/all", "getAndStoreAllMasteries"),
+			url(r"^runes/get/all", "getAndStoreAllRunes"),
 )

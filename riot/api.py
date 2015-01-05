@@ -197,14 +197,20 @@ def getUserMatchData(request):
 		#region = account.region
 		region = 'na'
 		summonerIdsArray = []
+		summonerId = False
 		summonerName = account.username
 
 		if region and summonerName:
-			response = retrieveSummonerbyName(region, summonerName)
 
-			if type(response) is dict:
-				summonerId = response[summonerName]['id']
+			try:
+				summoner=Summoner.objects.get(name=summonerName.lower())
+				summonerId=summoner.summonerId
+			except:
+				response = retrieveSummonerbyName(region, summonerName)
+				if type(response) is dict:
+					summonerId = response[summonerName]['id']
 
+			if summonerId:
 				#Get most recent match
 				matchHistory = retrieveMatchHistoryBySummonerId(region, summonerId)
 
@@ -230,7 +236,6 @@ def getUserMatchData(request):
 							#collect summonerIds we don't have info on so we can use 1 call to riot instead of multiple
 							summonerIdsArray.append(str(participant_dict['player']['summonerId']))
 
-
 						player_stats = {'wins':0, 'ranked_wins':0, 'wins_with_champion':0, 'kda':''}
 						#Add Summoner Spells and Masteries to return dict
 						participant_dict['spell1'] = getSummonerSpell(participant['spell1Id'], region)
@@ -239,7 +244,6 @@ def getUserMatchData(request):
 						participant_dict['runes'] = getSummonerRunes(participant['runes'],region)
 						participant_dict['stats'] = getSummonerNormalWins(participant_dict['player']['summonerId'],region)
 
-						#participant_dict['ranked_wins'] = getSummonerRankedWins(participant_dict['player']['summonerId'],region, participant['championId'])
 						participant_dict['champion_stats'] = getSummonerChampionStats(participant_dict['player']['summonerId'],region, participant['championId'])
 
 						participant_dict['champion_name'] = champion_name
@@ -292,6 +296,19 @@ def getAndStoreAllMasteries(request):
 
 	if region:
 		response = getAndStoreMasteries(region)
+
+		rtn_dict['response'] = response
+
+	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
+
+
+def getAndStoreAllRunes(request):
+	rtn_dict = {"success": False, "msg": ""}
+
+	region = request.GET.get('region', 'na')
+
+	if region:
+		response = getAndStoreRunes(region)
 
 		rtn_dict['response'] = response
 
