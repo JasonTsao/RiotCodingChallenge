@@ -57,6 +57,10 @@
         getCurrentMatchData();
     });
 
+    function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     function toggleTeamView(mode){
         if (mode == 'challenger'){
 
@@ -213,8 +217,8 @@
 
         stats = player_data['stats'];
 
-        wins.html('Wins      ' + stats['wins']);
-        ranked_wins.html('Ranked    ' + stats['ranked_wins']);
+        wins.html('Wins      ' + numberWithCommas(stats['wins']));
+        ranked_wins.html('Ranked    ' + numberWithCommas(stats['ranked_wins']));
         season_tier.html(player_data['highestAchievedSeasonTier']);
         //kda_ratio.html('KDA       ' + stats['kda']);
 
@@ -278,7 +282,7 @@
         stats = player_data['stats']
         champion_stats = player_data['champion_stats']
 
-        wins_as_champion.html('Wins ' + champion_stats['wins']);
+        wins_as_champion.html('Wins ' + numberWithCommas(champion_stats['wins']));
         kda.html('KDA ' + champion_stats['kda']);
         
         masteries_title.html('Masteries');
