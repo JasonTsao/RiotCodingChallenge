@@ -32,7 +32,7 @@ api calls to Riot but I'll get to that.
 
 INSTALLATION INSTRUCTIONS (Ubuntu)
 ==================================
-
+Make sure python version is 2.7.6
 
 Prequisite applications
 ------------------------
@@ -73,6 +73,10 @@ Setting up database
 -------------------
 python manage.py syncdb  (follow the instructions that come up and say yes to everything)
 python manage.py migrate
+
+if python manage.py syncdb didn't work try 
+python2.7-dbg manage.py syncdb
+python2.7-dbg manage.py migrate
 
 
 Start Server
