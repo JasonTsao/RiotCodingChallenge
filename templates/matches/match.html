@@ -211,16 +211,11 @@
         summoner_name.html(player_data.player.summonerName);
         summoner_level.html(player_data.summonerLevel);
 
-        /* replace with adaptive data!*/
         stats = player_data['stats'];
-        //player_data['wins'] = 9000
-        //player_data['ranked_wins'] = 242
-        //player_data['kda'] = '7.2/4.6/10.2';
 
         wins.html('Wins      ' + stats['wins']);
         ranked_wins.html('Ranked    ' + stats['ranked_wins']);
         season_tier.html(player_data['highestAchievedSeasonTier']);
-
         //kda_ratio.html('KDA       ' + stats['kda']);
 
         summoner_name_container.append(summoner_name);

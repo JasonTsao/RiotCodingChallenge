@@ -8,7 +8,7 @@ RIOT_API_URL = 'https://na.api.pvp.net'
 
 from accounts.models import Account
 from champions.models import Champion, Spell, GeneralSpell
-from summoners.models import Summoner, SummonerSummaryStats
+from summoners.models import Summoner, SummonerSummaryStats, SummonerChampionStats
 from static_data.models import Mastery, Rune
 
 logger = logging.getLogger("django.request")
@@ -296,14 +296,18 @@ def getSummonerNormalWins(summonerId, region):
 			if game.ranked:
 				player_stats['ranked_wins'] += game.wins
 
+			'''
 			player_stats['kills'] += game.totalChampionKills if game.totalChampionKills else 0
 			player_stats['deaths'] += game.totalDeathsPerSession if game.totalDeathsPerSession else 0
 			player_stats['assists'] += game.totalAssists if game.totalAssists else 0
+			'''
 
+		'''
 		#if player_stats['kills'] and player_stats['deaths'] and player_stats['assists']:
 		if player_stats['kills'] and player_stats['assists']:
 			kda = ["%.1f" % (player_stats['kills']/num_games), "%.1f" % (player_stats['deaths']/num_games), "%.1f" % (player_stats['assists']/num_games)]
 			player_stats['kda'] = '/'.join(kda)
+		'''
 
  	except Exception as e:
  		print 'Error retreiving summoner normal stats: {0}'.format(e)
@@ -314,28 +318,43 @@ def getSummonerNormalWins(summonerId, region):
 def getSummonerChampionStats(summonerId, region, championId):
  	ranked_player_stats = {'wins':0, 'losses':0,'kills':0.0, 'deaths':0.0, 'assists':0.0, 'kda':'n/a', 'sessions_played': 0}
 
+ 	champion_stats_obj = False
+
  	try:
-		response = retrieveRankedStatsBySummonerId(region, summonerId)
-	 	if type(response) is dict:
-	 		champion_stats = response['champions']
-	 		for champion in champion_stats:
-	 			if champion['id'] == championId:
-	 				stats = champion['stats']
-	 				num_games = stats['totalSessionsPlayed']
-	 				ranked_player_stats['wins'] = stats['totalSessionsWon']
-	 				ranked_player_stats['losses'] = stats['totalSessionsLost']
-	 				ranked_player_stats['sessions_played'] = num_games
+ 		champion_obj = Champion.objects.get(champion_id=championId)
+	 	try:
+	 		champion_stats_obj = SummonerChampionStats.objects.get(summoner_id=summonerId,champion=champion_obj)
+	 	except Exception as e:
+	 		response = retrieveRankedStatsBySummonerId(region, summonerId)
+	 		if type(response) is dict:
+				 champion_stats = response['champions']
+				 for champion in champion_stats:
+				 	if champion['id'] == championId:
+				 		stats = champion['stats']
+					 	num_games = stats['totalSessionsPlayed']
+					 	champion_stats_obj = SummonerChampionStats(summoner_id=summonerId, champion=champion_obj)
+					 	champion_stats_obj.wins = stats['totalSessionsWon']
+					 	champion_stats_obj.losses = stats['totalSessionsLost']
+					 	champion_stats_obj.sessionsPlayed = num_games
+					 	champion_stats_obj.averageChampionsKilled = float(stats['totalChampionKills'])/num_games
+					 	champion_stats_obj.averageNumDeaths = float(stats['totalDeathsPerSession'])/num_games
+					 	champion_stats_obj.averageAssists = float(stats['totalAssists'])/num_games
+					 	champion_stats_obj.save()
+					 	break
 
-	 				ranked_player_stats['kills'] = float(stats['totalChampionKills'])/num_games
-	 				ranked_player_stats['deaths'] = float(stats['totalDeathsPerSession'])/num_games
-	 				ranked_player_stats['assists'] = float(stats['totalAssists'])/num_games
+		if champion_stats_obj:
+			ranked_player_stats['wins'] = champion_stats_obj.wins
+			ranked_player_stats['losses'] = champion_stats_obj.losses
+			ranked_player_stats['sessions_played'] = champion_stats_obj.sessionsPlayed
 
-	 				if ranked_player_stats['kills'] and ranked_player_stats['deaths'] and ranked_player_stats['kills']:
-						kda = ["%.1f" % (ranked_player_stats['kills']), "%.1f" % (ranked_player_stats['deaths']), "%.1f" % (ranked_player_stats['assists'])]
-						ranked_player_stats['kda'] = '/'.join(kda)
-					break
+			ranked_player_stats['kills'] = champion_stats_obj.averageChampionsKilled
+			ranked_player_stats['deaths'] = champion_stats_obj.averageNumDeaths
+			ranked_player_stats['assists'] = champion_stats_obj.averageAssists
 
+			if ranked_player_stats['kills'] and ranked_player_stats['deaths'] and ranked_player_stats['kills']:
+				kda = ["%.1f" % (ranked_player_stats['kills']), "%.1f" % (ranked_player_stats['deaths']), "%.1f" % (ranked_player_stats['assists'])]
+				ranked_player_stats['kda'] = '/'.join(kda)
 	except Exception as e:
- 		print 'Error retreiving summoner ranked champion stats: {0}'.format(e)
+		print 'Unable to pull summoner champion stats: {0}'.format(e)
 
  	return ranked_player_stats
