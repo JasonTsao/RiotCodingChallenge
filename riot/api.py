@@ -214,7 +214,7 @@ def getUserMatchData(request):
 				#Get most recent match
 				matchHistory = retrieveMatchHistoryBySummonerId(region, summonerId)
 
-				if type(matchHistory) is dict:
+				if type(matchHistory) is dict and matchHistory:
 					matchId = matchHistory['matchId']
 
 					#Get more relevant data about the most recent match
