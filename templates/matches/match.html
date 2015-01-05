@@ -67,15 +67,6 @@
 
                 });
             });
-
-            
-
-            
-            /*$('#challenger-matchup-container').removeClass('hidden-container');
-            $('#opponent-title').removeClass('team-title-selected');
-
-            $('#opponent-matchup-container').addClass('hidden-container');
-            $('#challenger-title').addClass('team-title-selected');*/
         }
         else if (mode == 'opponent'){
 
@@ -86,13 +77,6 @@
                     $('#opponent-title').addClass('team-title-selected');
                 });
             });
-
-            
-            /*$('#opponent-matchup-container').removeClass('hidden-container');
-            $('#challenger-title').removeClass('team-title-selected');
-
-            $('#challenger-matchup-container').addClass('hidden-container');
-            $('#opponent-title').addClass('team-title-selected');*/
         }
     }
 
@@ -237,21 +221,21 @@
         ranked_wins.html('Ranked    ' + stats['ranked_wins']);
         season_tier.html(player_data['highestAchievedSeasonTier']);
 
-        kda_ratio.html('KDA       ' + stats['kda']);
+        //kda_ratio.html('KDA       ' + stats['kda']);
 
         summoner_name_container.append(summoner_name);
         summoner_level_container.append(summoner_level);
 
         wins_container.append(wins);
         ranked_wins_container.append(ranked_wins);
-        kda_ratio_container.append(kda_ratio);
+        //kda_ratio_container.append(kda_ratio);
         season_tier_container.append(season_tier);
 
         basic_info_container.append(summoner_name_container);
         basic_info_container.append(season_tier_container);
         basic_info_container.append(wins_container);
         basic_info_container.append(ranked_wins_container);
-        basic_info_container.append(kda_ratio_container);
+        //basic_info_container.append(kda_ratio_container);
         
         
         player_data_container.append(player_icon_img_container);
